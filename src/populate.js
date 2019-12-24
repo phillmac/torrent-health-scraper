@@ -32,6 +32,7 @@ async function populate () {
   for (const t of missing) {
     await redisClient.hset('torrents', t._id, JSON.stringify(t))
   }
+  process.exit()
 }
 
 populate()
