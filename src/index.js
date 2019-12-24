@@ -43,6 +43,8 @@ async function run () {
             await redisClient.sadd('queue', workItem._id)
             await redisClient.hset('torrents', workItem._id, JSON.stringify(await scrape(workItem)))
             await redisClient.srem('queue', workItem._id)
+        } else {
+            console.info('No stale torrents')
         }
     } catch (err) {
         console.error(err)
