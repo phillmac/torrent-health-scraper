@@ -42,7 +42,7 @@ async function run () {
 
             await redisClient.sadd('queue', workItem._id)
             await redisClient.hset('torrents', workItem._id, JSON.stringify(await scrape(workItem)))
-            await redisClient.srem('queue', workItem)
+            await redisClient.srem('queue', workItem._id)
         }
     } catch (err) {
         console.error(err)
