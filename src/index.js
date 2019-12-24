@@ -168,4 +168,4 @@ function isStaleDHT (torrent) {
   }
 }
 
-setTimeout(run, 30 * 1000)
+setInterval(run, 30 * 1000)
