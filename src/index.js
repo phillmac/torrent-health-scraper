@@ -30,17 +30,22 @@ let lockout = false
 
 async function run () {
   if (!lockout) {
-    lockout = true
-    const torrents = await redisClient.hgetall('torrents')
-    const queued = await redisClient.smembers('queue')
-    const workItem = Object.values(torrents)
-      .map(t=>JSON.parse(t))
-      .filter(t => !(queued.includes(t._id)))
-      .find(t => isStale(t))
+    try{
+        lockout = true
+        const torrents = await redisClient.hgetall('torrents')
+        const queued = await redisClient.smembers('queue')
+        const workItem = Object.values(torrents)
+          .map(t=>JSON.parse(t))
+          .filter(t => !(queued.includes(t._id)))
+          .find(t => isStale(t))
 
-    await redisClient.sadd('queue', workItem._id)
-    await redisClient.hset('torrents', workItem._id, await scrape(workItem))
-    await redisClient.srem('queue', workItem)
+        await redisClient.sadd('queue', workItem._id)
+        await redisClient.hset('torrents', workItem._id, await scrape(workItem))
+        await redisClient.srem('queue', workItem)
+    } catch (err) {
+        console.error(err)
+        process.exit()
+    }
     console.debug(new Date())
     lockout = false
   }
