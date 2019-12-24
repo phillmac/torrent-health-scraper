@@ -1,3 +1,4 @@
+'use strict'
 if (!process.env.MAX_AGE) {
   throw Error('MAX_AGE is required')
 }
