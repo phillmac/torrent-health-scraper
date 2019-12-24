@@ -52,6 +52,8 @@ async function run () {
     }
     console.debug(new Date())
     lockout = false
+  } else {
+      console.debug('Already running')
   }
 }
 
