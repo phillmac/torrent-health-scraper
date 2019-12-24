@@ -10,13 +10,13 @@ if (!process.env.REDIS_PORT) {
   throw Error('REDIS_PORT is required')
 }
 
-const asyncRedis = require('async-redis')
+const redis = require('redis-promisify')
 const Tracker = require('bittorrent-tracker')
 const DHT = require('bittorrent-dht')
 const crypto = require('crypto')
 const { promisify } = require('util');
 
-const redisClient = asyncRedis.createClient({ host: process.env.REDIS_HOST, port: parseInt(process.env.REDIS_PORT) })
+const redisClient = redis.createClient({ host: process.env.REDIS_HOST, port: parseInt(process.env.REDIS_PORT) })
 
 const lock = promisify(require('redis-lock')(redisClient));
 
@@ -36,18 +36,18 @@ async function run () {
   if (!lockout) {
     try{
         lockout = true
-        const torrents = await redisClient.hgetall('torrents')
+        const torrents = await redisClient.hgetallAsync('torrents')
         const unlock = await lock('qLock');
-        const queued = await redisClient.smembers('queue')
+        const queued = await redisClient.smembersAsync('queue')
         const workItem = Object.values(torrents)
           .map(t=>JSON.parse(t))
           .filter(t => !(queued.includes(t._id)))
           .find(t => isStale(t))
         if (workItem) {
-            await redisClient.sadd('queue', workItem._id)
+            await redisClient.saddAsync('queue', workItem._id)
             unlock()
-            await redisClient.hset('torrents', workItem._id, JSON.stringify(await scrape(workItem)))
-            await redisClient.srem('queue', workItem._id)
+            await redisClient.hsetAsync('torrents', workItem._id, JSON.stringify(await scrape(workItem)))
+            await redisClient.sremAsync('queue', workItem._id)
         } else {
             unlock()
             console.info('No stale torrents')
