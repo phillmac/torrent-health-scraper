@@ -38,10 +38,12 @@ async function run () {
           .map(t=>JSON.parse(t))
           .filter(t => !(queued.includes(t._id)))
           .find(t => isStale(t))
+        if (workItem) {
 
-        await redisClient.sadd('queue', workItem._id)
-        await redisClient.hset('torrents', workItem._id, JSON.stringify(await scrape(workItem)))
-        await redisClient.srem('queue', workItem)
+            await redisClient.sadd('queue', workItem._id)
+            await redisClient.hset('torrents', workItem._id, JSON.stringify(await scrape(workItem)))
+            await redisClient.srem('queue', workItem)
+        }
     } catch (err) {
         console.error(err)
         process.exit()
