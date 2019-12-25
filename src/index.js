@@ -72,7 +72,7 @@ async function scrape (torrent) {
   }
   await scrapeTrackers(torrent)
 
-  console.debug(torrent)
+  //console.debug(torrent)
   return torrent
 }
 
