@@ -64,7 +64,7 @@ async function run () {
 }
 
 async function scrape (torrent) {
-  console.debug(`Scraping ${torrent._id}`)
+  console.info(`Scraping ${torrent._id}`)
   if (isStaleDHT(torrent)) {
     await scrapeDHT(torrent).catch(err => console.error(err))
   } else {
@@ -73,6 +73,8 @@ async function scrape (torrent) {
   await scrapeTrackers(torrent)
 
   //console.debug(torrent)
+  console.info(`Finished scraping ${torrent._id}`)
+
   return torrent
 }
 
