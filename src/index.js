@@ -175,4 +175,6 @@ function isStaleDHT (torrent) {
   }
 }
 
-setInterval(run, 30 * 1000)
+const runInterval = process.env.RUN_INTERVAL ? parseInt(process.env.RUN_INTERVAL) : 30
+
+setInterval(run, runInterval * 1000)
