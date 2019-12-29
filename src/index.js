@@ -61,6 +61,10 @@ async function run () {
   } else {
     console.debug('Already running')
   }
+
+  if (doRecycle) {
+    process.exit()
+  }
 }
 
 async function scrape (torrent) {
@@ -178,8 +182,13 @@ function isStaleDHT (torrent) {
 
 const runInterval = process.env.RUN_INTERVAL ? parseInt(process.env.RUN_INTERVAL) : 30
 
+var doRecycle = false
+
+
 setInterval(run, runInterval * 1000)
 
 if (process.env.RECYCLE_TIMEOUT) {
-  setTimeout(process.exit, parseInt(process.env.RECYCLE_TIMEOUT) * 1000)
+  setTimeout(function () {
+    doRecycle = true
+  }, parseInt(process.env.RECYCLE_TIMEOUT) * 1000)
 }
