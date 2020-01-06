@@ -34,7 +34,7 @@ async function addTrackers () {
         addedCount ++
       }
     }
-    await redisClient.hsetAsync('torrents', t._id, JSON.stringify(await scrape(t)))
+    await redisClient.hsetAsync('torrents', t._id, JSON.stringify(t))
   }
   console.info(`Updated ${addedCount} torrents`)
 }
