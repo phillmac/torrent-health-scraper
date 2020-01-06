@@ -29,10 +29,10 @@ async function addTrackers () {
   let addedCount = 0
   for (const t of torrents) {
     for (const a of trackers) {
-      if (! (t.trackers.includes(a))) {
-        //console.debug(t)
+      if (!(t.trackers.includes(a))) {
+        // console.debug(t)
         t.trackers.push(a)
-        addedCount ++
+        addedCount++
       }
     }
     await redisClient.hsetAsync('torrents', t._id, JSON.stringify(t))
@@ -40,4 +40,4 @@ async function addTrackers () {
   console.info(`Updated ${addedCount} torrents`)
 }
 
-addTrackers().then(()=>process.exit())
+addTrackers().then(() => process.exit())
