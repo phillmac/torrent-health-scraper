@@ -157,6 +157,7 @@ function isStale (torrent) {
 
 function isStaleTracker (torrent, tracker) {
   if ((await redisClient.smembersAsync('tracker_ignore')).includes(tracker)) {
+    console.debug(`Ignoring tracker ${tracker}`)
     return false
   }
 
