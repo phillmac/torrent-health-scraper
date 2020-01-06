@@ -156,7 +156,7 @@ function isStale (torrent) {
 }
 
 function isStaleTracker (torrent, tracker) {
-  if ((await redisClient.smembersAsync('tracker_ignore')).includes(tracker)) {
+  if (trackerIgnore.includes(tracker)) {
     console.debug(`Ignoring tracker ${tracker}`)
     return false
   }
@@ -187,7 +187,11 @@ function isStaleDHT (torrent) {
 
 const runInterval = process.env.RUN_INTERVAL ? parseInt(process.env.RUN_INTERVAL) : 30
 
-var doRecycle = false
+let doRecycle = false
+let trackerIgnore
+redisClient.smembersAsync('tracker_ignore').then((data) => trackerIgnore = data)
+
+
 
 
 setInterval(run, runInterval * 1000)
