@@ -30,6 +30,7 @@ async function addTrackers () {
   for (const t of torrents) {
     for (const a of trackers) {
       if (! (t.trackers.includes(a))) {
+        console.debug(t)
         t.trackers.push(a)
         addedCount ++
       }
