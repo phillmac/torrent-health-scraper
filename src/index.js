@@ -40,6 +40,8 @@ async function run () {
       const unlock = await lock('qLock')
       const queued = await redisClient.smembersAsync('queue')
       const workItem = Object.values(torrents)
+      trackerIgnore = await redisClient.smembersAsync('tracker_ignore')
+
         .map(t => JSON.parse(t))
         .filter(t => !(queued.includes(t._id)))
         .find(t => isStale(t))
@@ -157,7 +159,7 @@ function isStale (torrent) {
 
 function isStaleTracker (torrent, tracker) {
   if (trackerIgnore.includes(tracker)) {
-    //console.debug(`Ignoring tracker ${tracker}`)
+    // console.debug(`Ignoring tracker ${tracker}`)
     return false
   }
 
@@ -189,7 +191,6 @@ const runInterval = process.env.RUN_INTERVAL ? parseInt(process.env.RUN_INTERVAL
 
 let doRecycle = false
 let trackerIgnore
-redisClient.smembersAsync('tracker_ignore').then((data) => { trackerIgnore = data })
 
 setInterval(run, runInterval * 1000)
 
