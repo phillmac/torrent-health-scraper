@@ -189,7 +189,7 @@ const runInterval = process.env.RUN_INTERVAL ? parseInt(process.env.RUN_INTERVAL
 
 let doRecycle = false
 let trackerIgnore
-redisClient.smembersAsync('tracker_ignore').then((data) => {trackerIgnore = data})
+redisClient.smembersAsync('tracker_ignore').then((data) => { trackerIgnore = data })
 
 setInterval(run, runInterval * 1000)
 
