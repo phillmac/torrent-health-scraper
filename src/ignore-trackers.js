@@ -61,19 +61,20 @@ async function run () {
 
       console.debug({trackerIgnore})
 
-      const blRemove = (await redisClient.smembersAsync('tracker_ignore')).filter((tRem) => !(trackerIgnore.includes(tRem)))
+      const blContents = await redisClient.smembersAsync('tracker_ignore')
+      const blRemove = blContents.filter((tRem) => !(trackerIgnore.includes(tRem)))
       if (blRemove.length > 0) {
         await redisClient.sremAsync('tracker_ignore', ...blRemove)
         console.info(`Removed ${blRemove} from blacklist`)
       }
 
-      const blContents = await redisClient.smembersAsync('tracker_ignore')
       const blAdd = trackerIgnore.filter((tAdd) => !(blContents.includes(tAdd)))
       if (blAdd.lenght > 0) {
         await redisClient.saddAsync('tracker_ignore', ...blAdd)
         console.info(`Added ${blAdd} to blacklist`)
       }
 
+      console.debug({blContents, blAdd, blRemove})
 
       unlock()
     } catch (err) {
