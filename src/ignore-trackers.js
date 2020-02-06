@@ -34,7 +34,7 @@ const maxErrors = parseInt(process.env.MAX_ERRORS)
 
 const errorAge = parseInt(process.env.ERROR_AGE)
 
-console.info({maxErrors, errorAge})
+console.info({ maxErrors, errorAge })
 
 let lockout = false
 
@@ -52,13 +52,13 @@ async function run () {
         if (trackerErrors[tErr].lenght !== fails.lenght) {
           await redisClient.hsetAsync('tracker_errors', tErr, JSON.stringify(fails))
         }
-        if(fails.length >= maxErrors) {
+        if (fails.length >= maxErrors) {
           trackerIgnore.push(tErr)
         }
         console.debug(tErr, fails.length)
       }
 
-      console.debug({trackerIgnore})
+      console.debug({ trackerIgnore })
 
       const blContents = await redisClient.smembersAsync('tracker_ignore')
       const blRemove = blContents.filter((tRem) => !(trackerIgnore.includes(tRem)))
@@ -73,7 +73,7 @@ async function run () {
         console.info(`Added ${blAdd} to blacklist`)
       }
 
-      console.debug({blContents, blAdd, blRemove})
+      console.debug({ blContents, blAdd, blRemove })
 
       unlock()
     } catch (err) {

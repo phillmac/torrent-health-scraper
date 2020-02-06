@@ -40,11 +40,12 @@ async function run () {
       const torrents = await redisClient.hgetallAsync('torrents')
       const unlock = await lock('qLock')
       const queued = await redisClient.smembersAsync('queue')
-      trackerIgnore = await redisClient.smembersAsync('tracker_ignore')
+      const trackerIgnore = await redisClient.smembersAsync('tracker_ignore')
+      console.debug({ trackerIgnore })
       const workItem = Object.values(torrents)
         .map(t => JSON.parse(t))
         .filter(t => !(queued.includes(t._id)))
-        .find(t => isStale(t))
+        .find(t => isStale(t, trackerIgnore))
       if (workItem) {
         await redisClient.saddAsync('queue', workItem._id)
         unlock()
@@ -69,14 +70,14 @@ async function run () {
   }
 }
 
-async function scrape (torrent) {
+async function scrape (torrent, trackerIgnore) {
   console.info(`Scraping ${torrent._id}`)
   if (isStaleDHT(torrent)) {
     await scrapeDHT(torrent).catch(err => console.error(err))
   } else {
     console.info('Skipping DHT scrape')
   }
-  await scrapeTrackers(torrent)
+  await scrapeTrackers(torrent, trackerIgnore)
 
   // console.debug(torrent)
   console.info(`Finished scraping ${torrent._id}`)
@@ -111,10 +112,10 @@ function scrapeDHT (torrent) {
   })
 }
 
-async function scrapeTrackers (torrent) {
+async function scrapeTrackers (torrent, trackerIgnore) {
   const trackerData = torrent.trackerData || {}
   const trackers = torrent.trackers
-    .filter((tracker) => isStaleTracker(torrent, tracker))
+    .filter((tracker) => isStaleTracker(torrent, tracker, trackerIgnore))
   const infoHash = torrent._id
   for (const announce of trackers) {
     try {
@@ -142,7 +143,7 @@ async function scrapeTrackers (torrent) {
   torrent.trackerData = trackerData
 }
 
-function isStale (torrent) {
+function isStale (torrent, trackerIgnore) {
   if (torrent.trackers.length === 0) {
     console.warn(`${torrent._id} has no trackers`)
   }
@@ -156,14 +157,14 @@ function isStale (torrent) {
   }
 
   for (const tracker of torrent.trackers) {
-    if (isStaleTracker(torrent, tracker)) {
+    if (isStaleTracker(torrent, tracker, trackerIgnore)) {
       return true
     }
   }
   return false
 }
 
-function isStaleTracker (torrent, tracker) {
+function isStaleTracker (torrent, tracker, trackerIgnore) {
   if (trackerIgnore.includes(tracker)) {
     // console.debug(`Ignoring tracker ${tracker}`)
     return false
@@ -196,7 +197,6 @@ function isStaleDHT (torrent) {
 const runInterval = process.env.RUN_INTERVAL ? parseInt(process.env.RUN_INTERVAL) : 30
 
 let doRecycle = false
-let trackerIgnore
 
 setInterval(run, runInterval * 1000)
 
