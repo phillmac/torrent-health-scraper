@@ -55,7 +55,7 @@ async function run () {
         if(fails.length >= maxErrors) {
           trackerIgnore.push(tErr)
         }
-        console.debug(tErr, fails.length, fails)
+        console.debug(tErr, fails.length)
       }
 
       console.debug({trackerIgnore})
