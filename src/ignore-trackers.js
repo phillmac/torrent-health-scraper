@@ -55,12 +55,16 @@ async function run () {
 
       const trackerIgnore = Object.keys(trackerErrors).filter((tErr) => trackerErrors[tErr].length >= maxErrors)
       const blRemove = (await redisClient.smembersAsync('tracker_ignore')).filter((tRem) => !(trackerIgnore.includes(tRem)))
-      await redisClient.sremAsync('tracker_ignore', ...blRemove)
-      console.info(`Removed ${blRemove} from blacklist`)
+      if (blRemove.length > 0) {
+        await redisClient.sremAsync('tracker_ignore', ...blRemove)
+        console.info(`Removed ${blRemove} from blacklist`)
+      }
 
       const blContents = await redisClient.smembersAsync('tracker_ignore')
-      const blAdd = trackerIgnore.filter((tAdd) => !(blContents.includes(tAdd)))
-      await redisClient.saddAsync('tracker_ignore', ...blAdd)
+      if (blAdd.lenght > 0) {
+        const blAdd = trackerIgnore.filter((tAdd) => !(blContents.includes(tAdd)))
+        await redisClient.saddAsync('tracker_ignore', ...blAdd)
+      }
 
       console.info(`Added ${blAdd} to blacklist`)
 
