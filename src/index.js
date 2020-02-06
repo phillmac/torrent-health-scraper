@@ -141,7 +141,7 @@ async function scrapeTrackers (torrent) {
     } catch (err) {
       console.error(err)
       trackerErrors[announce] = (trackerErrors[announce] || 0) + 1
-      console.debug(`Error count ${trackerErrors[announce]}`)
+      console.debug(trackerErrors)
     }
   }
   torrent.trackerData = trackerData
@@ -170,7 +170,7 @@ function isStale (torrent) {
 
 function isStaleTracker (torrent, tracker) {
   if (trackerIgnore.includes(tracker)) {
-    // console.debug(`Ignoring tracker ${tracker}`)
+    console.debug(`Ignoring tracker ${tracker}`)
     return false
   }
 
