@@ -69,7 +69,7 @@ async function run () {
       }
 
       const blAdd = trackerIgnore.filter((tAdd) => !(blContents.includes(tAdd)))
-      if (blAdd.lenght > 0) {
+      if (blAdd.length > 0) {
         await redisClient.saddAsync('tracker_ignore', ...blAdd)
         console.info(`Added ${blAdd} to blacklist`)
       }
