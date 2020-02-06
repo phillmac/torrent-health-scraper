@@ -18,7 +18,7 @@
   "homepage": "https://github.com/phillmac/torrent-health-scraper#readme",
   "dependencies": {
     "bittorrent-dht": "^9.0.3",
-    "bittorrent-tracker": "^9.14.4",
+    "bittorrent-tracker": "github:phillmac/bittorrent-tracker",
     "redis-lock": "^0.1.4",
     "redis-promisify": "^0.1.2"
   }
