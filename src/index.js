@@ -137,7 +137,6 @@ async function scrapeTrackers (torrent) {
       trackerErrors.push(Math.floor(new Date() / 1000))
       await redisClient.hsetAsync('tracker_errors', announce, JSON.stringify(trackerErrors))
       unlock()
-      console.debug(announce, trackerErrors)
     }
   }
   torrent.trackerData = trackerData
