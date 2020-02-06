@@ -170,7 +170,7 @@ function isStale (torrent) {
 
 function isStaleTracker (torrent, tracker) {
   if (trackerIgnore.includes(tracker)) {
-    console.debug(`Ignoring tracker ${tracker}`)
+    // console.debug(`Ignoring tracker ${tracker}`)
     return false
   }
 
