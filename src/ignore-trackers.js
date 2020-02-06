@@ -47,7 +47,7 @@ async function run () {
         console.debug(tErr, trackerErrors[tErr])
         const fails = trackerErrors[tErr].filter((f) => f + errorAge < Math.floor(new Date() / 1000))
         if (trackerErrors[tErr].lenght !== fails.lenght) {
-          await redisClient.hsetAsync(tracker_errors, tErr, JSON.stringify(fails))
+          await redisClient.hsetAsync('tracker_errors', tErr, JSON.stringify(fails))
           trackerErrors[tErr] = fails
         }
         console.debug(tErr, fails.length)
@@ -60,7 +60,7 @@ async function run () {
 
       const blContents = await redisClient.smembersAsync('tracker_ignore')
       const blAdd = trackerIgnore.filter((tAdd) => !(blContents.includes(tAdd)))
-      await redisClient.saddAsync(tracker_ignore, ...blAdd)
+      await redisClient.saddAsync('tracker_ignore', ...blAdd)
 
       console.info(`Added ${blAdd} to blacklist`)
 
