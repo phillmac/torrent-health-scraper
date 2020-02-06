@@ -44,13 +44,14 @@ async function run () {
       lockout = true
       const unlock = await lock('eLock')
       const trackerErrors = await redisClient.hgetallAsync('tracker_errors')
+      const tNow = Math.floor(new Date() / 1000)
 
       for (const tErr of Object.keys(trackerErrors)) {
         const raw = JSON.parse(trackerErrors[tErr])
         console.debug(raw)
         const fails = raw.filter((f) => {
-          console.debug(f, f + errorAge < Math.floor(new Date() / 1000))
-          return f + errorAge < Math.floor(new Date() / 1000)
+          console.debug(f, f + errorAge, tNow, f + errorAge < tNow)
+          return f + errorAge < tNow
         })
         if (trackerErrors[tErr].lenght !== fails.lenght) {
           await redisClient.hsetAsync('tracker_errors', tErr, JSON.stringify(fails))
