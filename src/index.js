@@ -122,7 +122,6 @@ async function scrapeTrackers (torrent) {
   const trackerData = torrent.trackerData || {}
   const trackers = torrent.trackers
     .filter((tracker) => isStaleTracker(torrent, tracker))
-    .filter((tracker) => (trackerErrors[tracker] || 0) <= maxErrors)
   const infoHash = torrent._id
   for (const announce of trackers) {
     try {
@@ -170,6 +169,11 @@ function isStale (torrent) {
 
 function isStaleTracker (torrent, tracker) {
   if (trackerIgnore.includes(tracker)) {
+    // console.debug(`Ignoring tracker ${tracker}`)
+    return false
+  }
+
+  if (trackerErrors[tracker] || 0 > maxErrors) {
     // console.debug(`Ignoring tracker ${tracker}`)
     return false
   }
