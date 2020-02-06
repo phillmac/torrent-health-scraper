@@ -30,12 +30,6 @@ redisClient.on('error', function (err) {
 })
 
 const maxAge = parseInt(process.env.MAX_AGE)
-let maxErrors = 30
-if (process.env.MAX_ERRORS) {
-  maxErrors = parseInt(process.env.MAX_ERRORS)
-}
-
-console.debug(`maxErrors: ${maxErrors}`)
 
 let lockout = false
 
