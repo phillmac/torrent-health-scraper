@@ -49,7 +49,7 @@ async function run () {
       if (workItem) {
         await redisClient.saddAsync('queue', workItem._id)
         unlock()
-        await redisClient.hsetAsync('torrents', workItem._id, JSON.stringify(await scrape(workItem)))
+        await redisClient.hsetAsync('torrents', workItem._id, JSON.stringify(await scrape(workItem, trackerIgnore)))
         await redisClient.sremAsync('queue', workItem._id)
       } else {
         unlock()
