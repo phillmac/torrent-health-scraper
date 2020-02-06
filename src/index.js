@@ -133,9 +133,9 @@ async function scrapeTrackers (torrent) {
     } catch (err) {
       console.error(err)
       const unlock = await lock('eLock')
-      const trackerErrors = JSON.parse(await redis.hgetAsync('tracker_errors', announce)) || []
+      const trackerErrors = JSON.parse(await redisClient.hgetAsync('tracker_errors', announce)) || []
       trackerErrors.push(Math.floor(new Date() / 1000))
-      await redis.setAsync('tracker_errors', announce, JSON.stringify(trackerErrors))
+      await redisClient.setAsync('tracker_errors', announce, JSON.stringify(trackerErrors))
       unlock()
       console.debug(announce, trackerErrors)
     }
