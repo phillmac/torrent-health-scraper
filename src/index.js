@@ -38,7 +38,6 @@ if (process.env.MAX_ERRORS) {
 console.debug(`maxErrors: ${maxErrors}`)
 
 let lockout = false
-const trackerErrors = {}
 
 async function run () {
   if (!lockout) {
@@ -139,8 +138,12 @@ async function scrapeTrackers (torrent) {
       })
     } catch (err) {
       console.error(err)
-      trackerErrors[announce] = (trackerErrors[announce] || 0) + 1
-      console.debug(trackerErrors)
+      const unlock = await lock('eLock')
+      const trackerErrors = JSON.parse(await redis.hgetAsync('tracker_errors', announce)) || []
+      trackerErrors.push(Math.floor(new Date() / 1000))
+      await redis.setAsync('tracker_errors', announce, JSON.stringify(trackerErrors))
+      unlock()
+      console.debug(announce, trackerErrors)
     }
   }
   torrent.trackerData = trackerData
@@ -169,11 +172,6 @@ function isStale (torrent) {
 
 function isStaleTracker (torrent, tracker) {
   if (trackerIgnore.includes(tracker)) {
-    // console.debug(`Ignoring tracker ${tracker}`)
-    return false
-  }
-
-  if ((trackerErrors[tracker] || 0) > maxErrors) {
     // console.debug(`Ignoring tracker ${tracker}`)
     return false
   }
