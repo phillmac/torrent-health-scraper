@@ -45,6 +45,7 @@ async function run () {
       const unlock = await lock('eLock')
       const trackerErrors = await redisClient.hgetallAsync('tracker_errors')
       const tNow = Math.floor(new Date() / 1000)
+      const trackerIgnore = []
 
       for (const tErr of Object.keys(trackerErrors)) {
         const fails = JSON.parse(trackerErrors[tErr]).filter((f) => f + errorAge > tNow)
@@ -52,10 +53,14 @@ async function run () {
           await redisClient.hsetAsync('tracker_errors', tErr, JSON.stringify(fails))
           trackerErrors[tErr] = fails
         }
+        if(fails.length >= maxErrors) {
+          trackerIgnore.push(tErr)
+        }
         console.debug(tErr, fails.length, fails)
       }
 
-      const trackerIgnore = Object.keys(trackerErrors).filter((tErr) => trackerErrors[tErr].length >= maxErrors)
+      console.debug({trackerIgnore})
+
       const blRemove = (await redisClient.smembersAsync('tracker_ignore')).filter((tRem) => !(trackerIgnore.includes(tRem)))
       if (blRemove.length > 0) {
         await redisClient.sremAsync('tracker_ignore', ...blRemove)
