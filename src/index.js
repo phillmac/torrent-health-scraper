@@ -31,7 +31,7 @@ redisClient.on('error', function (err) {
 
 const maxAge = parseInt(process.env.MAX_AGE)
 let maxErrors = 30
-if(process.env.MAX_ERRORS) {
+if (process.env.MAX_ERRORS) {
   maxErrors = parseInt(process.env.MAX_ERRORS)
 }
 
@@ -122,7 +122,7 @@ async function scrapeTrackers (torrent) {
   const trackerData = torrent.trackerData || {}
   const trackers = torrent.trackers
     .filter((tracker) => isStaleTracker(torrent, tracker))
-    .filter((tracker) => trackerErrors[tracker] < maxErrors)
+    .filter((tracker) => (trackerErrors[tracker] || 0) <= maxErrors)
   const infoHash = torrent._id
   for (const announce of trackers) {
     try {
