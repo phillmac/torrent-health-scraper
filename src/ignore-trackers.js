@@ -34,6 +34,8 @@ const maxErrors = parseInt(process.env.MAX_ERRORS)
 
 const errorAge = parseInt(process.env.ERROR_AGE)
 
+console.info({maxErrors, errorAge})
+
 let lockout = false
 
 async function run () {
@@ -44,7 +46,9 @@ async function run () {
       const trackerErrors = await redisClient.hgetallAsync('tracker_errors')
 
       for (const tErr of Object.keys(trackerErrors)) {
-        const fails = JSON.parse(trackerErrors[tErr]).filter((f) => f + errorAge < Math.floor(new Date() / 1000))
+        const raw = JSON.parse(trackerErrors[tErr])
+        console.debug(raw)
+        const fails = raw.filter((f) => f + errorAge < Math.floor(new Date() / 1000))
         if (trackerErrors[tErr].lenght !== fails.lenght) {
           await redisClient.hsetAsync('tracker_errors', tErr, JSON.stringify(fails))
           trackerErrors[tErr] = fails
