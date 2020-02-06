@@ -47,9 +47,8 @@ async function run () {
       const torrents = await redisClient.hgetallAsync('torrents')
       const unlock = await lock('qLock')
       const queued = await redisClient.smembersAsync('queue')
-      const workItem = Object.values(torrents)
       trackerIgnore = await redisClient.smembersAsync('tracker_ignore')
-
+      const workItem = Object.values(torrents)
         .map(t => JSON.parse(t))
         .filter(t => !(queued.includes(t._id)))
         .find(t => isStale(t))
