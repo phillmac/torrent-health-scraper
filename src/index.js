@@ -173,7 +173,7 @@ function isStaleTracker (torrent, tracker) {
     return false
   }
 
-  if (trackerErrors[tracker] || 0 > maxErrors) {
+  if ((trackerErrors[tracker] || 0) > maxErrors) {
     // console.debug(`Ignoring tracker ${tracker}`)
     return false
   }
