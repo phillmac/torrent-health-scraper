@@ -141,6 +141,7 @@ async function scrapeTrackers (torrent) {
     } catch (err) {
       console.error(err)
       trackerErrors[announce] = (trackerErrors[announce] || 0) + 1
+      console.debug(`Error count ${trackerErrors[announce]}`)
     }
   }
   torrent.trackerData = trackerData
