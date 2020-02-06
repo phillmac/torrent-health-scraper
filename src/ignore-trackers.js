@@ -44,8 +44,8 @@ async function run () {
       const trackerErrors = await redisClient.hgetallAsync('tracker_errors')
 
       for (const tErr of Object.keys(trackerErrors)) {
-        console.debug(tErr, typeof trackerErrors[tErr])
-        const fails = Array.filter(trackerErrors[tErr], (f) => f + errorAge < Math.floor(new Date() / 1000))
+        console.debug(tErr, trackerErrors[tErr])
+        const fails = JSON.parse(trackerErrors[tErr]).filter((f) => f + errorAge < Math.floor(new Date() / 1000))
         if (trackerErrors[tErr].lenght !== fails.lenght) {
           await redisClient.hsetAsync('tracker_errors', tErr, JSON.stringify(fails))
           trackerErrors[tErr] = fails
