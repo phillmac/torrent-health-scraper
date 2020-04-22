@@ -38,10 +38,10 @@ async function run () {
         if (trackerErrors[tErr].length !== fails[tErr].length) {
           await redisClient.hsetAsync('tracker_errors', tErr, JSON.stringify(fails[tErr]))
         }
-        if (fails.length >= maxErrors) {
+        if (fails[tErr].length >= maxErrors) {
           trackerIgnore.push(tErr)
         }
-        console.debug(tErr, fails.length)
+        console.debug(tErr, fails[tErr].length)
       }
 
       console.debug({ trackerIgnore })
