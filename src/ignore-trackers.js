@@ -27,15 +27,16 @@ async function run () {
   if (!lockout) {
     try {
       lockout = true
+      const fails = {}
       const unlock = await lock('eLock')
       const trackerErrors = await redisClient.hgetallAsync('tracker_errors')
       const tNow = Math.floor(new Date() / 1000)
       const trackerIgnore = []
 
       for (const tErr of Object.keys(trackerErrors)) {
-        const fails = JSON.parse(trackerErrors[tErr]).filter((f) => f + errorAge > tNow)
-        if (trackerErrors[tErr].length !== fails.length) {
-          await redisClient.hsetAsync('tracker_errors', tErr, JSON.stringify(fails))
+        fails[tErr] = JSON.parse(trackerErrors[tErr]).filter((f) => f + errorAge > tNow)
+        if (trackerErrors[tErr].length !== fails[tErr].length) {
+          await redisClient.hsetAsync('tracker_errors', tErr, JSON.stringify(fails[tErr]))
         }
         if (fails.length >= maxErrors) {
           trackerIgnore.push(tErr)
@@ -46,7 +47,7 @@ async function run () {
       console.debug({ trackerIgnore })
 
       const blContents = await redisClient.smembersAsync('tracker_ignore')
-      const blRemove = blContents.filter((tRem) => (!(trackerIgnore.includes(tRem)) && (trackerErrors[tRem].length > minErrors)))
+      const blRemove = blContents.filter((tRem) => (!(trackerIgnore.includes(tRem)) && (fails[tRem].length > minErrors)))
       if (blRemove.length > 0) {
         await redisClient.sremAsync('tracker_ignore', ...blRemove)
         console.info(`Removed ${blRemove} from blacklist`)
