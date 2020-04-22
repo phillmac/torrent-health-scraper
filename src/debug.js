@@ -1,7 +1,6 @@
-const { redisClient, lock } = require('./redis.js')
-const functions = (require('./functions.js')(redisClient, lock, true))
-
 module.exports = async function debugScrape (hash) {
+  const { redisClient, lock } = require('./redis.js')
+  const functions = (require('./functions.js')(redisClient, lock, true))
   let unlock
   try {
     const rawTorrents = await redisClient.hgetallAsync('torrents')
