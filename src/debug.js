@@ -27,7 +27,7 @@ module.exports = async function debugScrape (hash) {
           return {
             tracker,
             stale: functions.isStaleTracker(torrent, tracker, trackerIgnore),
-            lastScraped: torrent.trackerData[tracker].scraped_date
+            lastScraped:  torrent.trackerData[tracker] ? torrent.trackerData[tracker].scraped_date: "never"
           }
         })
         console.info({
