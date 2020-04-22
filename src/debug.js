@@ -5,6 +5,7 @@ module.exports = async function debugScrape (hash) {
   try {
     const rawTorrents = await redisClient.hgetallAsync('torrents')
     const torrentHashes = Object.keys(rawTorrents)
+    console.debug({torrentHashes})
 
     if (!(hash in torrentHashes)) {
       console.error(`Hash ${hash} is not valid`)
