@@ -25,7 +25,7 @@ module.exports = async function debugScrape (hash) {
       const trackers = torrent.trackers.map(tracker => {
         return {
           tracker,
-          stale: functions.isStaleTracker(torrent, tracker),
+          stale: functions.isStaleTracker(torrent, tracker, trackerIgnore),
           lastScraped: torrent.trackerData[tracker].scraped_date
         }
       })
