@@ -7,28 +7,7 @@ if (!process.env.ERROR_AGE) {
   throw Error('ERROR_AGE is required')
 }
 
-if (!process.env.REDIS_HOST) {
-  throw Error('REDIS_HOST is required')
-}
-
-if (!process.env.REDIS_PORT) {
-  throw Error('REDIS_PORT is required')
-}
-
-const redis = require('redis-promisify')
-const { promisify } = require('util')
-
-const redisClient = redis.createClient({ host: process.env.REDIS_HOST, port: parseInt(process.env.REDIS_PORT) })
-
-const lock = promisify(require('redis-lock')(redisClient))
-
-redisClient.on('connect', function () {
-  console.info('Redis client connected')
-})
-
-redisClient.on('error', function (err) {
-  console.error('Redis error', err)
-})
+const { redisClient, lock } = require('./redis.js')
 
 const maxErrors = parseInt(process.env.MAX_ERRORS)
 
