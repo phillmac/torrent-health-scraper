@@ -29,7 +29,6 @@ async function run () {
       for (const tErr of Object.keys(trackerErrors)) {
         const fails = JSON.parse(trackerErrors[tErr]).filter((f) => f + errorAge > tNow)
         if (trackerErrors[tErr].length !== fails.length) {
-          console.debug(`Pruning fails for ${tErr}`)
           await redisClient.hsetAsync('tracker_errors', tErr, JSON.stringify(fails))
         }
         if (fails.length >= maxErrors) {
