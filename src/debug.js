@@ -51,14 +51,14 @@ async function debugScrape (hash) {
   }
 }
 
-async function runDebug() {
+async function runDebug () {
   console.info(`Debugging hash ${process.env.TORRENT_HASH}`)
   await debugScrape(process.env.TORRENT_HASH)
-  console.info("Finished")
+  console.info('Finished')
   process.exit()
 }
 
-if (process.env.TORRENT_HASH !== "") {
+if (process.env.TORRENT_HASH !== '') {
   runDebug()
 } else {
   module.exports = debugScrape
