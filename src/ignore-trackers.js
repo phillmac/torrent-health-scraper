@@ -3,6 +3,10 @@ if (!process.env.MAX_ERRORS) {
   throw Error('MAX_ERRORS is required')
 }
 
+if (!process.env.MIN_ERRORS) {
+  throw Error('MIN_ERRORS is required')
+}
+
 if (!process.env.ERROR_AGE) {
   throw Error('ERROR_AGE is required')
 }
@@ -10,6 +14,8 @@ if (!process.env.ERROR_AGE) {
 const { redisClient, lock } = require('./redis.js')
 
 const maxErrors = parseInt(process.env.MAX_ERRORS)
+
+const minErrors = parseInt(process.env.MIN_ERRORS)
 
 const errorAge = parseInt(process.env.ERROR_AGE)
 
@@ -40,7 +46,7 @@ async function run () {
       console.debug({ trackerIgnore })
 
       const blContents = await redisClient.smembersAsync('tracker_ignore')
-      const blRemove = blContents.filter((tRem) => !(trackerIgnore.includes(tRem)))
+      const blRemove = blContents.filter((tRem) => !(trackerIgnore.includes(tRem) && trackerErrors[tErr].length < minErrors))
       if (blRemove.length > 0) {
         await redisClient.sremAsync('tracker_ignore', ...blRemove)
         console.info(`Removed ${blRemove} from blacklist`)
