@@ -46,7 +46,7 @@ async function run () {
       console.debug({ trackerIgnore })
 
       const blContents = await redisClient.smembersAsync('tracker_ignore')
-      const blRemove = blContents.filter((tRem) => !(trackerIgnore.includes(tRem) && trackerErrors[tErr].length < minErrors))
+      const blRemove = blContents.filter((tRem) => !(trackerIgnore.includes(tRem) && trackerErrors[tRem].length < minErrors))
       if (blRemove.length > 0) {
         await redisClient.sremAsync('tracker_ignore', ...blRemove)
         console.info(`Removed ${blRemove} from blacklist`)
