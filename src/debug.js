@@ -47,5 +47,6 @@ module.exports = async function debugScrape (hash) {
     console.error(err)
   } finally {
     if (typeof unlock === 'function') unlock()
+    redisClient.quit()
   }
 }
