@@ -1,4 +1,4 @@
-module.exports = async function debugScrape (hash) {
+async function debugScrape (hash) {
   const { redisClient, lock } = require('./redis.js')
   const functions = (require('./functions.js')(redisClient, lock, true))
   let unlock
@@ -47,6 +47,12 @@ module.exports = async function debugScrape (hash) {
     console.error(err)
   } finally {
     if (typeof unlock === 'function') unlock()
-    redisClient.quit()
+    await redisClient.quitAsync()
   }
+}
+
+if (process.env.TORRENT_HASH) {
+  debugScrape(process.env.TORRENT_HASH)
+} else {
+  module.exports = debugScrape
 }
