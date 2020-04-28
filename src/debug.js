@@ -1,3 +1,5 @@
+'use strict'
+
 async function debugScrape (hash) {
   const { redisClient, lock } = require('./redis.js')
   const functions = (require('./functions.js')(redisClient, lock, true))

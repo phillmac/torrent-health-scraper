@@ -1,3 +1,4 @@
+'use strict'
 const Tracker = require('bittorrent-tracker')
 const DHT = require('bittorrent-dht')
 const crypto = require('crypto')
