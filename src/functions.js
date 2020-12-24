@@ -2,6 +2,8 @@
 const Tracker = require('bittorrent-tracker')
 const DHT = require('bittorrent-dht')
 const crypto = require('crypto')
+const parseTorrent = require('parse-torrent')
+const fetch = require('isomorphic-unfetch')
 
 if (!process.env.MAX_AGE) {
   throw Error('MAX_AGE is required')
@@ -134,5 +136,26 @@ module.exports = function (redisClient, lock, debugVerbose = false) {
     }
   }
 
-  return { scrape, scrapeDHT, scrapeTrackers, isStale, isStaleTracker, isStaleDHT }
+  async function torrentFromUrl (url) {
+    const resp = await fetch(url)
+    const buffer = await resp.buffer()
+    return parseTorrent(buffer)
+  }
+
+  async function healthFromUrl (url, hash) {
+    const resp = await fetch(url,
+      {
+        method: 'post',
+        body: JSON.stringify({ hash }),
+        headers: { 'Content-Type': 'application/json' }
+      }
+    )
+    const result = await resp.json()
+    if (Array.isArray(result)) {
+      return result.find(t=> t['_id'] === hash)
+    }
+    return result
+  }
+
+  return { scrape, scrapeDHT, scrapeTrackers, isStale, isStaleTracker, isStaleDHT, torrentFromUrl, healthFromUrl }
 }

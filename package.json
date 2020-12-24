@@ -19,6 +19,9 @@
   "dependencies": {
     "bittorrent-dht": "^9.0.3",
     "bittorrent-tracker": "github:phillmac/bittorrent-tracker",
+    "docopt": "^0.6.2",
+    "isomorphic-unfetch": "^3.1.0",
+    "parse-torrent": "^9.1.0",
     "redis-lock": "^0.1.4",
     "redis-promisify": "^0.1.2"
   }
