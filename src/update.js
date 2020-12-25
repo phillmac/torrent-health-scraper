@@ -9,7 +9,7 @@ class Cli {
       `
 Update v${version}
 Usage:
-    update.js [--torrent-url=TORRENT_URL] [options]
+    update.js [--torrent-url=TORRENT_URL] [--type=TYPE] [options]
     update.js -h | --help | --version
 Options:
     --redis-host=REDIS_HOST             Connect to redis on REDIS_HOST
@@ -39,6 +39,10 @@ if (args['--torrent-url']) {
   process.env.TORRENT_URL = args['--torrent-url']
 }
 
+if (args['--type']) {
+  process.env.TORRENT_TYPE = args['--type']
+}
+
 const { torrentFromUrl, sleep } = require('./utils.js')
 
 async function run () {
@@ -62,6 +66,11 @@ async function add (link, torrent) {
     const trackers = Array.from(new Set([...announce, ...existing.trackers]))
     console.log({ infoHash, name, exists, created_unix, length, files: files.length, trackers: trackers.length })
     const updated = { _id: infoHash, name, link, created_unix, size_bytes: length, trackers, dhtData, trackerData }
+
+    if (process.env.TORRENT_TYPE) {
+      updated.type = process.env.TORRENT_TYPE
+    }
+
     let isQueued = true
     while (isQueued) {
       const unlock = await lock('qLock')
