@@ -93,7 +93,7 @@ async function debugScrape (hash) {
   }
 }
 
-if (process.env.TORRENT_HASH !== '') {
+if (process.env.TORRENT_HASH !== '' && process.env.TORRENT_HASH !== undefined) {
   (async () => {
     console.info(`Debugging hash ${process.env.TORRENT_HASH}`)
     await debugScrape(process.env.TORRENT_HASH)
