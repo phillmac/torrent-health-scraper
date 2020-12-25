@@ -65,6 +65,7 @@ async function add (link, torrent) {
     const isQueued = true
     while (isQueued) {
       const unlock = await lock('qLock')
+      const queued = await redisClient.smembersAsync('queue')
       isQueued = queued.includes(updated._id)
       if (!isQueued) {
         await redisClient.hsetAsync('torrents', updated._id, JSON.stringify(updated))
