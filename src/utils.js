@@ -1,6 +1,8 @@
 'use strict'
 const parseTorrent = require('parse-torrent')
 const fetch = require('isomorphic-unfetch')
+const { redisClient, lock } = require('./redis.js')
+
 
 async function torrentFromUrl (url) {
   const resp = await fetch(url)
@@ -30,7 +32,6 @@ function sleep (ms) {
 }
 
 async function add (link, torrent) {
-  const { redisClient } = require('./redis.js')
   const { infoHash, name, created, length, files, announce } = torrent
   const existing = await redisClient.hgetAsync('torrents', infoHash)
   const exists = existing !== null
@@ -47,7 +48,6 @@ async function add (link, torrent) {
 }
 
 async function update (link, torrent) {
-  const { redisClient, lock } = require('./redis.js')
   const { infoHash, name, created, length, files, announce } = torrent
   const existing = JSON.parse(await redisClient.hgetAsync('torrents', infoHash))
   const exists = existing !== null
