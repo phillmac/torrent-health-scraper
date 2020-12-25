@@ -19,7 +19,7 @@ const minErrors = parseInt(process.env.MIN_ERRORS)
 
 const errorAge = parseInt(process.env.ERROR_AGE)
 
-console.info({ maxErrors, errorAge })
+console.info({ maxErrors, minErrors, errorAge })
 
 let lockout = false
 
