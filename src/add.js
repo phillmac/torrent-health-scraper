@@ -9,12 +9,11 @@ class Cli {
       `
 Add v${version}
 Usage:
-    add.js --torrent-url=TORRENT_URL [options]
+    add.js [--torrent-url=TORRENT_URL] [options]
     add.js -h | --help | --version
 Options:
     --redis-host=REDIS_HOST             Connect to redis on REDIS_HOST
     --redis-port=REDIS_PORT             Connect to redis on REDIS_PORT
-    --max-age=MAX_AGE                   Maximum age before considering torrent health info stale
 `
     const _args = docopt(doc, {
       version: version
