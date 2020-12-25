@@ -52,8 +52,8 @@ async function update (link, torrent) {
   const existing = JSON.parse(await redisClient.hgetAsync('torrents', infoHash))
   const exists = existing !== null
   const created_unix = Math.floor(Date.parse(created) / 1000)
-  const { dhtData, trackerData } = existing
   if (exists) {
+    const { dhtData, trackerData } = existing
     const trackers = Array.from(new Set([...announce, ...existing.trackers]))
     console.log({ infoHash, name, exists, created_unix, length, files: files.length, trackers: trackers.length })
     const updated = { _id: infoHash, name, link, created_unix, size_bytes: length, trackers, dhtData, trackerData }
