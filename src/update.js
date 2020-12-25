@@ -59,7 +59,7 @@ async function add (link, torrent) {
   const created_unix = Math.floor(Date.parse(created) / 1000)
   const { dhtData, trackerData } = existing
   if (exists) {
-    const trackers = Array.from(new Set([...announce, ...existing.trackers]))
+    const trackers = Array.from(new Set([...announce, ...existing['trackers']]))
     console.log({ infoHash, name, exists, created_unix, length, files: files.length, trackers: trackers.length })
     const updated = { _id: infoHash, name, link, created_unix, size_bytes: length, trackers, dhtData, trackerData }
     const isQueued = true
