@@ -58,9 +58,9 @@ async function add (link, torrent) {
   const exists = existing !== null
   const created_unix = Math.floor(Date.parse(created) / 1000)
   const { dhtData, trackerData } = existing
-  const trackers = Array.from(new Set([...announce, ...existing.trackers]))
-  console.log({ infoHash, name, exists, created_unix, length, files: files.length, trackers: trackers.length })
   if (exists) {
+    console.log({ infoHash, name, exists, created_unix, length, files: files.length, trackers: trackers.length })
+    const trackers = Array.from(new Set([...announce, ...existing.trackers]))
     const updated = { _id: infoHash, name, link, created_unix, size_bytes: length, trackers, dhtData, trackerData }
     const isQueued = true
     while (isQueued) {
@@ -73,6 +73,8 @@ async function add (link, torrent) {
       unlock()
       sleep(100)
     }
+  } else {
+    console.log(`Torrent with hash ${infoHash} not found`)
   }
 }
 
