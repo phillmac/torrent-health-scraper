@@ -2,8 +2,7 @@
 const Tracker = require('bittorrent-tracker')
 const DHT = require('bittorrent-dht')
 const crypto = require('crypto')
-const parseTorrent = require('parse-torrent')
-const fetch = require('isomorphic-unfetch')
+
 
 if (!process.env.MAX_AGE) {
   throw Error('MAX_AGE is required')
