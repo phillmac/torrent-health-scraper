@@ -54,12 +54,12 @@ async function run () {
 async function add (link, torrent) {
   const { redisClient, lock } = require('./redis.js')
   const { infoHash, name, created, length, files, announce } = torrent
-  const existing = await redisClient.hgetAsync('torrents', infoHash)
+  const existing = JSON.parse(await redisClient.hgetAsync('torrents', infoHash))
   const exists = existing !== null
   const created_unix = Math.floor(Date.parse(created) / 1000)
   const { dhtData, trackerData } = existing
   if (exists) {
-    const trackers = Array.from(new Set([...announce, ...existing['trackers']]))
+    const trackers = Array.from(new Set([...announce, ...existing.trackers]))
     console.log({ infoHash, name, exists, created_unix, length, files: files.length, trackers: trackers.length })
     const updated = { _id: infoHash, name, link, created_unix, size_bytes: length, trackers, dhtData, trackerData }
     const isQueued = true
