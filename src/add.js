@@ -39,6 +39,9 @@ if (args['--torrent-url']) {
   process.env.TORRENT_URL = args['--torrent-url']
 }
 
+const { torrentFromUrl } = require('./utils.js')
+
+
 async function run () {
   if (process.env.TORRENT_URL) {
     add(await torrentFromUrl(process.env.TORRENT_URL))
@@ -46,10 +49,10 @@ async function run () {
 }
 
 async function add (torrent) {
-    const { redisClient } = require('./redis.js')
-    const { infoHash } = torrent
-    const exists = null !== await redisClient.hgetAsync('torrents', infoHash)
-    console.log({exists, torrent})
+  const { redisClient } = require('./redis.js')
+  const { infoHash } = torrent
+  const exists = await redisClient.hgetAsync('torrents', infoHash) !== null
+  console.log({ exists, torrent })
 }
 
 run()

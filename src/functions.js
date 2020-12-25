@@ -136,26 +136,5 @@ module.exports = function (redisClient, lock, debugVerbose = false) {
     }
   }
 
-  async function torrentFromUrl (url) {
-    const resp = await fetch(url)
-    const buffer = await resp.buffer()
-    return parseTorrent(buffer)
-  }
-
-  async function healthFromUrl (url, hash) {
-    const resp = await fetch(url,
-      {
-        method: 'post',
-        body: JSON.stringify({ hash }),
-        headers: { 'Content-Type': 'application/json' }
-      }
-    )
-    const result = await resp.json()
-    if (Array.isArray(result)) {
-      return result.find(t=> t['_id'] === hash)
-    }
-    return result
-  }
-
-  return { scrape, scrapeDHT, scrapeTrackers, isStale, isStaleTracker, isStaleDHT, torrentFromUrl, healthFromUrl }
+  return { scrape, scrapeDHT, scrapeTrackers, isStale, isStaleTracker, isStaleDHT }
 }

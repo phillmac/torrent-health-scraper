@@ -42,7 +42,7 @@ if (args['--max-age']) {
   process.env.MAX_AGE = args['--max-age']
 }
 
-const { torrentFromUrl, healthFromUrl } = (require('./functions.js')(null, null))
+const { torrentFromUrl, healthFromUrl } = require('./utils.js')
 
 async function run () {
   if (args['--torrent-url']) {
