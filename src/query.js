@@ -48,8 +48,9 @@ async function run () {
   if (args['--torrent-url']) {
     const torrentUrl = args['--torrent-url']
     const { infoHash } = await torrentFromUrl(torrentUrl)
-    query(infoHash)
+    await query(infoHash)
   }
+  process.exit()
 }
 
 async function query (infoHash) {
