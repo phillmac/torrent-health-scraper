@@ -9,7 +9,8 @@ class Cli {
       `
 Debug v${version}
 Usage:
-    debug.js [--torrent-hash=TORRENT_HASH] [options]
+    debug.js --torrent-hash=TORRENT_HASH [options]
+    debug.js --torrent-hashes-stdin [options]
     debug.js -h | --help | --version
 Options:
     --redis-host=REDIS_HOST             Connect to redis on REDIS_HOST
@@ -96,11 +97,20 @@ async function runDebug () {
   console.info(`Debugging hash ${process.env.TORRENT_HASH}`)
   await debugScrape(process.env.TORRENT_HASH)
   console.info('Finished')
-  process.exit()
 }
 
 if (process.env.TORRENT_HASH !== '') {
   runDebug()
+  process.exit()
+} else if (args['--torrent-hashes-stdin']) {
+    const fs = require("fs");
+    const hashesRaw = fs.readFileSync(0, "utf-8");
+    const hashes = hashesRaw.split(' ')
+    for (const h of hashes) {
+        console.info(`Debugging hash ${h}`)
+        await debugScrape(h)
+        console.info('Finished')
+    }
 } else {
   module.exports = debugScrape
 }
