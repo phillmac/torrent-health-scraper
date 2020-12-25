@@ -3,7 +3,6 @@ const parseTorrent = require('parse-torrent')
 const fetch = require('isomorphic-unfetch')
 const { redisClient, lock } = require('./redis.js')
 
-
 async function torrentFromUrl (url) {
   const resp = await fetch(url)
   const buffer = await resp.buffer()
@@ -61,7 +60,6 @@ async function update (link, torrent) {
     if (process.env.TORRENT_TYPE) {
       updated.type = process.env.TORRENT_TYPE
     }
-    let count =0
     let isQueued = true
     while (isQueued) {
       const unlock = await lock('qLock')

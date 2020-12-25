@@ -43,7 +43,7 @@ if (args['--type']) {
   process.env.TORRENT_TYPE = args['--type']
 }
 
-const { torrentFromUrl, sleep, update } = require('./utils.js')
+const { torrentFromUrl, update } = require('./utils.js')
 
 async function run () {
   if (process.env.TORRENT_URL) {
@@ -54,7 +54,5 @@ async function run () {
   }
   process.exit()
 }
-
-
 
 run()
