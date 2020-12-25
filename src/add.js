@@ -9,7 +9,7 @@ class Cli {
       `
 Add v${version}
 Usage:
-    add.js [--torrent-url=TORRENT_URL] [options]
+    add.js [--torrent-url=TORRENT_URL] [--type=TYPE] [options]
     add.js -h | --help | --version
 Options:
     --redis-host=REDIS_HOST             Connect to redis on REDIS_HOST
@@ -39,6 +39,10 @@ if (args['--torrent-url']) {
   process.env.TORRENT_URL = args['--torrent-url']
 }
 
+if (args['--type']) {
+  process.env.TORRENT_TYPE = args['--type']
+}
+
 const { torrentFromUrl } = require('./utils.js')
 
 async function run () {
@@ -60,6 +64,9 @@ async function add (link, torrent) {
   console.log({ infoHash, name, exists, created_unix, length, files: files.length, trackers: announce.length })
   if (!exists) {
     const newTorrent = { _id: infoHash, name, link, created_unix, size_bytes: length, trackers: announce }
+    if (process.env.TORRENT_TYPE) {
+      newTorrent.type = process.env.TORRENT_TYPE
+    }
     await redisClient.hsetAsync('torrents', newTorrent._id, JSON.stringify(newTorrent))
     console.log('Added to db')
   }
