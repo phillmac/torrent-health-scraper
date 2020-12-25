@@ -62,7 +62,7 @@ async function add (link, torrent) {
     const trackers = Array.from(new Set([...announce, ...existing.trackers]))
     console.log({ infoHash, name, exists, created_unix, length, files: files.length, trackers: trackers.length })
     const updated = { _id: infoHash, name, link, created_unix, size_bytes: length, trackers, dhtData, trackerData }
-    const isQueued = true
+    let isQueued = true
     while (isQueued) {
       const unlock = await lock('qLock')
       const queued = await redisClient.smembersAsync('queue')
