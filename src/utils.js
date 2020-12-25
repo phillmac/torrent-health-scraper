@@ -61,7 +61,7 @@ async function update (link, torrent) {
     if (process.env.TORRENT_TYPE) {
       updated.type = process.env.TORRENT_TYPE
     }
-
+    let count =0
     let isQueued = true
     while (isQueued) {
       const unlock = await lock('qLock')
@@ -72,7 +72,7 @@ async function update (link, torrent) {
         console.log('Updated')
       }
       unlock()
-      sleep(100)
+      await sleep(100)
     }
   } else {
     console.log(`Torrent with hash ${infoHash} not found`)
