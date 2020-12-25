@@ -105,7 +105,6 @@ if (process.env.TORRENT_HASH !== '' && process.env.TORRENT_HASH !== undefined) {
   (async () => {
     const fs = require('fs')
     const hashesRaw = fs.readFileSync(0, 'utf-8')
-    console.log(hashesRaw, 'hashesRaw')
     const hashes = hashesRaw.split(' ')
     for (const h of hashes) {
       console.info(`Debugging hash ${h}`)
