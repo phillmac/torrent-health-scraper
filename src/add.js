@@ -43,18 +43,26 @@ const { torrentFromUrl } = require('./utils.js')
 
 async function run () {
   if (process.env.TORRENT_URL) {
-    await add(await torrentFromUrl(process.env.TORRENT_URL))
+    const fetchedTorrent = await torrentFromUrl(process.env.TORRENT_URL)
+    if (fetchedTorrent) {
+      await add(process.env.TORRENT_URL, fetchedTorrent)
+    }
   }
   process.exit()
 }
 
-async function add (torrent) {
+async function add (link, torrent) {
   const { redisClient } = require('./redis.js')
   const { infoHash, name, created, length, files, announce } = torrent
   const existing = await redisClient.hgetAsync('torrents', infoHash)
   const exists = existing !== null
   const created_unix = Math.floor(Date.parse(created) / 1000)
   console.log({ infoHash, name, exists, created_unix, length, files: files.length, trackers: announce.length })
+  if (!exists) {
+    const newTorrent = { _id: infoHash, name, link, created_unix, length, trackers: announce }
+    await redisClient.hsetAsync('torrents', newTorrent._id, JSON.stringify(newTorrent))
+    console.log('Added to db')
+  }
 }
 
 run()
