@@ -59,7 +59,7 @@ async function add (link, torrent) {
   const created_unix = Math.floor(Date.parse(created) / 1000)
   console.log({ infoHash, name, exists, created_unix, length, files: files.length, trackers: announce.length })
   if (!exists) {
-    const newTorrent = { _id: infoHash, name, link, created_unix, length, trackers: announce }
+    const newTorrent = { _id: infoHash, name, link, created_unix, size_bytes: length, trackers: announce }
     await redisClient.hsetAsync('torrents', newTorrent._id, JSON.stringify(newTorrent))
     console.log('Added to db')
   }
