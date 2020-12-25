@@ -76,7 +76,7 @@ async function update (link, torrent) {
     }
   } else {
     console.log(`Torrent with hash ${infoHash} not found`)
-    add(link, torrent)
+    await add(link, torrent)
   }
 }
 module.exports = { torrentFromUrl, healthFromUrl, sleep, add, update }
