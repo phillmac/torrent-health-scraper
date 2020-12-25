@@ -53,7 +53,8 @@ async function add (torrent) {
   const { infoHash, name, created, length, files, announce } = torrent
   const existing = await redisClient.hgetAsync('torrents', infoHash)
   const exists = existing !== null
-  console.log({ infoHash, name, exists, created, length, files: files.length, trackers: announce.length })
+  const created_unix = Math.floor(Date.parse(created) / 1000)
+  console.log({ infoHash, name, exists, created_unix, length, files: files.length, trackers: announce.length })
 }
 
 run()
