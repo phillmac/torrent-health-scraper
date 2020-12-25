@@ -3,7 +3,6 @@ const Tracker = require('bittorrent-tracker')
 const DHT = require('bittorrent-dht')
 const crypto = require('crypto')
 
-
 if (!process.env.MAX_AGE) {
   throw Error('MAX_AGE is required')
 }
