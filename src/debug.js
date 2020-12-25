@@ -40,9 +40,10 @@ if (args['--torrent-hash']) {
   process.env.TORRENT_HASH = args['--torrent-hash']
 }
 
+const { redisClient, lock } = require('./redis.js')
+const functions = (require('./functions.js')(redisClient, lock, true))
+
 async function debugScrape (hash) {
-  const { redisClient, lock } = require('./redis.js')
-  const functions = (require('./functions.js')(redisClient, lock, true))
   let unlock
   try {
     const rawTorrents = await redisClient.hgetallAsync('torrents')
@@ -89,28 +90,30 @@ async function debugScrape (hash) {
     console.error(err)
   } finally {
     if (typeof unlock === 'function') unlock()
-    await redisClient.quitAsync()
   }
 }
 
-async function runDebug () {
-  console.info(`Debugging hash ${process.env.TORRENT_HASH}`)
-  await debugScrape(process.env.TORRENT_HASH)
-  console.info('Finished')
-}
-
 if (process.env.TORRENT_HASH !== '') {
-  runDebug()
-  process.exit()
+  (async () => {
+    console.info(`Debugging hash ${process.env.TORRENT_HASH}`)
+    await debugScrape(process.env.TORRENT_HASH)
+    console.info('Finished')
+    await redisClient.quitAsync()
+    process.exit()
+  })()
 } else if (args['--torrent-hashes-stdin']) {
-    const fs = require("fs");
-    const hashesRaw = fs.readFileSync(0, "utf-8");
+  (async () => {
+    const fs = require('fs')
+    const hashesRaw = fs.readFileSync(0, 'utf-8')
     const hashes = hashesRaw.split(' ')
     for (const h of hashes) {
-        console.info(`Debugging hash ${h}`)
-        await debugScrape(h)
-        console.info('Finished')
+      console.info(`Debugging hash ${h}`)
+      await debugScrape(h)
+      console.info('Finished')
     }
+    await redisClient.quitAsync()
+    process.exit()
+  })()
 } else {
   module.exports = debugScrape
 }
