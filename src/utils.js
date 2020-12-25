@@ -23,9 +23,9 @@ async function healthFromUrl (url, hash) {
   return result
 }
 
-function sleep(ms) {
+function sleep (ms) {
   return new Promise((resolve) => {
-    setTimeout(resolve, ms);
-  });
+    setTimeout(resolve, ms)
+  })
 }
 module.exports = { torrentFromUrl, healthFromUrl, sleep }
