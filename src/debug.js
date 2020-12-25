@@ -23,7 +23,7 @@ async function debugScrape (hash) {
       } else {
         const isStale = functions.isStale(torrent, trackerIgnore)
         const isStaleDHT = functions.isStaleDHT(torrent)
-        const dhtScraped = torrent.dhtData.scraped_date
+        const dhtScraped = torrent?.dhtData?.scraped_date
         const trackers = torrent.trackers.map(tracker => {
           return {
             tracker,
