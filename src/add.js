@@ -43,7 +43,7 @@ if (args['--type']) {
   process.env.TORRENT_TYPE = args['--type']
 }
 
-const { torrentFromUrl } = require('./utils.js')
+const { torrentFromUrl, add } = require('./utils.js')
 
 async function run () {
   if (process.env.TORRENT_URL) {
@@ -53,23 +53,6 @@ async function run () {
     }
   }
   process.exit()
-}
-
-async function add (link, torrent) {
-  const { redisClient } = require('./redis.js')
-  const { infoHash, name, created, length, files, announce } = torrent
-  const existing = await redisClient.hgetAsync('torrents', infoHash)
-  const exists = existing !== null
-  const created_unix = Math.floor(Date.parse(created) / 1000)
-  console.log({ infoHash, name, exists, created_unix, length, files: files.length, trackers: announce.length })
-  if (!exists) {
-    const newTorrent = { _id: infoHash, name, link, created_unix, size_bytes: length, trackers: announce }
-    if (process.env.TORRENT_TYPE) {
-      newTorrent.type = process.env.TORRENT_TYPE
-    }
-    await redisClient.hsetAsync('torrents', newTorrent._id, JSON.stringify(newTorrent))
-    console.log('Added to db')
-  }
 }
 
 run()

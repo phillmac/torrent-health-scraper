@@ -28,4 +28,55 @@ function sleep (ms) {
     setTimeout(resolve, ms)
   })
 }
-module.exports = { torrentFromUrl, healthFromUrl, sleep }
+
+async function add (link, torrent) {
+  const { redisClient } = require('./redis.js')
+  const { infoHash, name, created, length, files, announce } = torrent
+  const existing = await redisClient.hgetAsync('torrents', infoHash)
+  const exists = existing !== null
+  const created_unix = Math.floor(Date.parse(created) / 1000)
+  console.log({ infoHash, name, exists, created_unix, length, files: files.length, trackers: announce.length })
+  if (!exists) {
+    const newTorrent = { _id: infoHash, name, link, created_unix, size_bytes: length, trackers: announce }
+    if (process.env.TORRENT_TYPE) {
+      newTorrent.type = process.env.TORRENT_TYPE
+    }
+    await redisClient.hsetAsync('torrents', newTorrent._id, JSON.stringify(newTorrent))
+    console.log('Added to db')
+  }
+}
+
+async function update (link, torrent) {
+  const { redisClient, lock } = require('./redis.js')
+  const { infoHash, name, created, length, files, announce } = torrent
+  const existing = JSON.parse(await redisClient.hgetAsync('torrents', infoHash))
+  const exists = existing !== null
+  const created_unix = Math.floor(Date.parse(created) / 1000)
+  const { dhtData, trackerData } = existing
+  if (exists) {
+    const trackers = Array.from(new Set([...announce, ...existing.trackers]))
+    console.log({ infoHash, name, exists, created_unix, length, files: files.length, trackers: trackers.length })
+    const updated = { _id: infoHash, name, link, created_unix, size_bytes: length, trackers, dhtData, trackerData }
+
+    if (process.env.TORRENT_TYPE) {
+      updated.type = process.env.TORRENT_TYPE
+    }
+
+    let isQueued = true
+    while (isQueued) {
+      const unlock = await lock('qLock')
+      const queued = await redisClient.smembersAsync('queue')
+      isQueued = queued.includes(updated._id)
+      if (!isQueued) {
+        await redisClient.hsetAsync('torrents', updated._id, JSON.stringify(updated))
+        console.log('Updated')
+      }
+      unlock()
+      sleep(100)
+    }
+  } else {
+    console.log(`Torrent with hash ${infoHash} not found`)
+    add(link, torrent)
+  }
+}
+module.exports = { torrentFromUrl, healthFromUrl, sleep, add, update }
