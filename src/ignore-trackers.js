@@ -75,9 +75,9 @@ async function run () {
         for (const addedItem of blAdd) {
           if (!(addedItem in events)) {
             events[addedItem] = []
-            events[addedItem].push(tNow)
-            console.info(`Added ${addedItem} to blacklist`)
           }
+          events[addedItem].push(tNow)
+          console.info(`Added ${addedItem} to blacklist`)
         }
       }
 
