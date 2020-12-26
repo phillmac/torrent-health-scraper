@@ -11,6 +11,10 @@ if (!process.env.ERROR_AGE) {
   throw Error('ERROR_AGE is required')
 }
 
+if (!process.env.EVENT_AGE) {
+  throw Error('EVENT_AGE is required')
+}
+
 const { redisClient, lock } = require('./redis.js')
 
 const maxErrors = parseInt(process.env.MAX_ERRORS)
@@ -19,7 +23,9 @@ const minErrors = parseInt(process.env.MIN_ERRORS)
 
 const errorAge = parseInt(process.env.ERROR_AGE)
 
-console.info({ maxErrors, minErrors, errorAge })
+const eventAge = parseInt(process.env.EVENT_AGE)
+
+console.info({ maxErrors, minErrors, errorAge, eventAge })
 
 let lockout = false
 
@@ -28,8 +34,10 @@ async function run () {
     try {
       lockout = true
       const fails = {}
+      const events = {}
       const unlock = await lock('eLock')
       const trackerErrors = await redisClient.hgetallAsync('tracker_errors')
+      const trackerEvents = await redisClient.hgetallAsync('tracker_events')
       const tNow = Math.floor(new Date() / 1000)
       const trackerIgnore = []
 
@@ -40,15 +48,39 @@ async function run () {
         }
         if (fails[tErr].length >= maxErrors) {
           trackerIgnore.push(tErr)
+          if (!(tErr in trackerEvents)) {
+            trackerEvents[tErr] = []
+          }
+          trackerEvents[tErr].push(tNow)
         }
         console.debug(tErr, fails[tErr].length)
       }
 
-      console.debug({ trackerIgnore })
+      for (const tEvt of Object.keys(trackerEvents)) {
+        events[tEvt] = JSON.parse(trackerEvents[tEvt]).filter((e) => e + eventAge > tNow)
+        if (trackerEvents[tEvt].length !== events[tEvt].length) {
+          await redisClient.hsetAsync('tracker_events', tEvt, JSON.stringify(events[tEvt]))
+        }
+      }
 
+      console.debug({ trackerIgnore })
+      const expBackoffFilter = (tracker) => {
+        const eventsList = events[tracker]
+        if (!eventsList) {
+          console.debug(`No events for ${tracker}`)
+          return true
+        }
+        const last = Math.max(eventsList)
+        const backoffTL = Math.pow(5, eventsList.length)
+        const result = last + backoffTL < tNow
+        console.debug(`${tracker} backoff expired: ${result}`)
+        return result
+      }
       const blContents = await redisClient.smembersAsync('tracker_ignore')
-      const blRemove = blContents.filter((tRem) =>
-        (!(trackerIgnore.includes(tRem)) && (fails[tRem].length < minErrors)))
+      const blRemove = blContents
+        .filter((tRem) =>
+          (!(trackerIgnore.includes(tRem)) && (fails[tRem].length < minErrors)))
+        .filter((tRem) => expBackoffFilter(tRem))
       if (blRemove.length > 0) {
         await redisClient.sremAsync('tracker_ignore', ...blRemove)
         console.info(`Removed ${blRemove} from blacklist`)
