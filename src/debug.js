@@ -107,7 +107,7 @@ if (process.env.TORRENT_HASH !== '' && process.env.TORRENT_HASH !== undefined) {
     const hashesRaw = fs.readFileSync(0, 'utf-8')
     const hashes = hashesRaw.split(' ')
     for (const h of hashes) {
-      console.info(`Debugging hash ${h}`)
+      console.info(`Debugging hash ${h} [${hashes.indexOf(h)}/${hashes.length}`)
       await debugScrape(h)
       console.info('Finished')
     }
