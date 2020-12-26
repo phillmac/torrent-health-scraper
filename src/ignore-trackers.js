@@ -75,7 +75,7 @@ async function run () {
           return true
         }
         const last = Math.max(eventsList)
-        const backoffTL = Math.pow(5, eventsList.length)
+        const backoffTL = Math.pow(2, eventsList.length)
         const result = last + backoffTL < tNow
         console.debug(`${tracker} backoff expired: ${result}`)
         return result
