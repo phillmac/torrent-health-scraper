@@ -29,7 +29,7 @@ console.info({ maxErrors, minErrors, errorAge, eventAge })
 
 let lockout = false
 
-async function run () {
+async function run() {
   if (!lockout) {
     try {
       lockout = true
@@ -48,16 +48,13 @@ async function run () {
         }
         if (fails[tErr].length >= maxErrors) {
           trackerIgnore.push(tErr)
-          if (!(trackerEvents && tErr in trackerEvents)) {
-            trackerEvents[tErr] = []
-          }
-          trackerEvents[tErr].push(tNow)
+          events[tErr] = [tNow]
         }
         console.debug(tErr, fails[tErr].length)
       }
 
       for (const tEvt of Object.keys(trackerEvents)) {
-        events[tEvt] = JSON.parse(trackerEvents[tEvt]).filter((e) => e + eventAge > tNow)
+        events[tEvt] = events[tEvt].concat(JSON.parse(trackerEvents[tEvt]).filter((e) => e + eventAge > tNow))
         if (trackerEvents[tEvt].length !== events[tEvt].length) {
           await redisClient.hsetAsync('tracker_events', tEvt, JSON.stringify(events[tEvt]))
         }
