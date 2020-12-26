@@ -39,6 +39,7 @@ async function run () {
       const trackerEventsRaw = (await redisClient.hgetallAsync('tracker_events') ?? {})
       const trackerEvents = Object.fromEntries(Object.keys(trackerEventsRaw).map(k => [k, JSON.parse(trackerEventsRaw[k]) ?? []]))
       const events = Object.fromEntries(Object.keys(trackerEvents).map(k => [k, Array.from(trackerEvents[k])]))
+      console.debug(JSON.stringify({ trackerEvents, events }))
       const tNow = Math.floor(new Date() / 1000)
       const trackerIgnore = []
 
