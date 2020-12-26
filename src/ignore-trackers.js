@@ -34,11 +34,11 @@ async function run () {
     try {
       lockout = true
       const fails = {}
-      const events = {}
       const unlock = await lock('eLock')
       const trackerErrors = await redisClient.hgetallAsync('tracker_errors')
       const trackerEventsRaw = (await redisClient.hgetallAsync('tracker_events') ?? {})
       const trackerEvents = Object.fromEntries(Object.keys(trackerEventsRaw).map(k => [k, JSON.parse(trackerEventsRaw[k]) ?? []]))
+      const events = Object.fromEntries(Object.keys(trackerEvents).map(k => [k, Array.from(trackerEvents[k])]))
       const tNow = Math.floor(new Date() / 1000)
       const trackerIgnore = []
 
@@ -67,25 +67,23 @@ async function run () {
         console.debug(`${tracker} backoff expired: ${result}`)
         return result
       }
-
       const blContents = await redisClient.smembersAsync('tracker_ignore')
 
       const blAdd = trackerIgnore.filter((tAdd) => !(blContents.includes(tAdd)))
       if (blAdd.length > 0) {
         await redisClient.saddAsync('tracker_ignore', ...blAdd)
         for (const addedItem of blAdd) {
-          if (!(addedItem in trackerEvents)) {
-            trackerEvents[addedItem] = []
-            events[addedItem] = Array.from(trackerEvents[addedItem])
+          if (!(addedItem in events)) {
+            events[addedItem] = []
             events[addedItem].push(tNow)
             console.info(`Added ${addedItem} to blacklist`)
           }
         }
       }
 
-      for (const tEvt of Object.keys(trackerEvents)) {
+      for (const tEvt of Object.keys(events)) {
         events[tEvt] = events[tEvt].filter((e) => e + eventAge > tNow)
-        if (trackerEvents[tEvt].length !== events[tEvt].length) {
+        if (!(trackerEvents[tEvt]) || trackerEvents[tEvt].length !== events[tEvt].length) {
           console.log(`Updating events for ${tEvt}`)
           await redisClient.hsetAsync('tracker_events', tEvt, JSON.stringify(events[tEvt]))
         }
