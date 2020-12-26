@@ -37,7 +37,8 @@ async function run () {
       const events = {}
       const unlock = await lock('eLock')
       const trackerErrors = await redisClient.hgetallAsync('tracker_errors')
-      const trackerEvents = await redisClient.hgetallAsync('tracker_events') ?? {}
+      const trackerEventsRaw = (await redisClient.hgetallAsync('tracker_events') ?? {})
+      const trackerEvents = Object.keys(trackerEventsRaw).map(k => JSON.parse(trackerEventsRaw[k]))
       const tNow = Math.floor(new Date() / 1000)
       const trackerIgnore = []
 
@@ -64,6 +65,7 @@ async function run () {
       }
 
       console.debug({ trackerIgnore })
+
       const expBackoffFilter = (tracker) => {
         const eventsList = events[tracker]
         if (!eventsList) {
@@ -76,6 +78,7 @@ async function run () {
         console.debug(`${tracker} backoff expired: ${result}`)
         return result
       }
+
       const blContents = await redisClient.smembersAsync('tracker_ignore')
       const blRemove = blContents
         .filter((tRem) =>
