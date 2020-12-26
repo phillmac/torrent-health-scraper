@@ -84,7 +84,6 @@ async function run () {
       for (const tEvt of Object.keys(events)) {
         events[tEvt] = events[tEvt].filter((e) => e + eventAge > tNow)
         if (!(trackerEvents[tEvt]) || trackerEvents[tEvt].length !== events[tEvt].length) {
-          console.log(`Updating events for ${tEvt}`)
           await redisClient.hsetAsync('tracker_events', tEvt, JSON.stringify(events[tEvt]))
         }
       }
