@@ -54,7 +54,8 @@ async function run () {
           } else {
             trackerEvents[tErr] = []
           }
-          trackerEvents[tErr].push(tNow)
+          events[tErr] = trackerEvents[tErr]
+          events[tErr].push(tNow)
         }
         console.debug(tErr, fails[tErr].length)
       }
