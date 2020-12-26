@@ -29,7 +29,7 @@ console.info({ maxErrors, minErrors, errorAge, eventAge })
 
 let lockout = false
 
-async function run() {
+async function run () {
   if (!lockout) {
     try {
       lockout = true
@@ -37,7 +37,7 @@ async function run() {
       const events = {}
       const unlock = await lock('eLock')
       const trackerErrors = await redisClient.hgetallAsync('tracker_errors')
-      const trackerEvents = await redisClient.hgetallAsync('tracker_events')
+      const trackerEvents = await redisClient.hgetallAsync('tracker_events') ?? {}
       const tNow = Math.floor(new Date() / 1000)
       const trackerIgnore = []
 
@@ -48,13 +48,16 @@ async function run() {
         }
         if (fails[tErr].length >= maxErrors) {
           trackerIgnore.push(tErr)
-          events[tErr] = [tNow]
+          if (!(tErr in trackerEvents)) {
+            trackerEvents[tErr] = []
+          }
+          trackerEvents[tErr].push(tNow)
         }
         console.debug(tErr, fails[tErr].length)
       }
 
       for (const tEvt of Object.keys(trackerEvents)) {
-        events[tEvt] = events[tEvt].concat(JSON.parse(trackerEvents[tEvt]).filter((e) => e + eventAge > tNow))
+        events[tEvt] = JSON.parse(trackerEvents[tEvt]).filter((e) => e + eventAge > tNow)
         if (trackerEvents[tEvt].length !== events[tEvt].length) {
           await redisClient.hsetAsync('tracker_events', tEvt, JSON.stringify(events[tEvt]))
         }
