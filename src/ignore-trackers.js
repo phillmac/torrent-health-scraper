@@ -39,7 +39,6 @@ async function run () {
       const trackerEventsRaw = (await redisClient.hgetallAsync('tracker_events') ?? {})
       const trackerEvents = Object.fromEntries(Object.keys(trackerEventsRaw).map(k => [k, JSON.parse(trackerEventsRaw[k]) ?? []]))
       const events = Object.fromEntries(Object.keys(trackerEvents).map(k => [k, Array.from(trackerEvents[k])]))
-      console.debug(JSON.stringify({ events }))
       const tNow = Math.floor(new Date() / 1000)
       const trackerIgnore = []
 
@@ -62,7 +61,7 @@ async function run () {
           console.debug(`No events for ${tracker}`)
           return true
         }
-        const last = Math.max(eventsList)
+        const last = Math.max(...eventsList)
         const backoffTL = Math.pow(2, eventsList.length)
         const result = last + backoffTL < tNow
         console.debug(`${tracker} backoff expired: ${JSON.stringify({ last, tNow, result, count: eventsList.length, backoffTL })}`)
