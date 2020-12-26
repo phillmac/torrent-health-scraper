@@ -48,7 +48,7 @@ async function run () {
         }
         if (fails[tErr].length >= maxErrors) {
           trackerIgnore.push(tErr)
-          if (!(tErr in trackerEvents)) {
+          if (!(trackerEvents && tErr in trackerEvents)) {
             trackerEvents[tErr] = []
           }
           trackerEvents[tErr].push(tNow)
