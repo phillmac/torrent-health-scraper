@@ -64,7 +64,7 @@ async function run () {
         const last = Math.max(eventsList)
         const backoffTL = Math.pow(2, eventsList.length)
         const result = last + backoffTL < tNow
-        console.debug(`${tracker} backoff expired: ${{ result, count: eventsList.length, backoffTL }}`)
+        console.debug(`${tracker} backoff expired: ${JSON.stringify({ result, count: eventsList.length, backoffTL })}`)
         return result
       }
       const blContents = await redisClient.smembersAsync('tracker_ignore')
