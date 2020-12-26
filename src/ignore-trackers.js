@@ -73,7 +73,7 @@ async function run () {
       if (blAdd.length > 0) {
         await redisClient.saddAsync('tracker_ignore', ...blAdd)
         for (const addedItem of blAdd) {
-          if (!(addedItem in events)) {
+          if (!(Object.keys(events).includes(addedItem))) {
             events[addedItem] = []
           }
           events[addedItem].push(tNow)
