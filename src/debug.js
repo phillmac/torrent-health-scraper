@@ -81,15 +81,19 @@ async function debugScrape (hash) {
           trackers
         })
         if (isStale) {
+          await redisClient.saddAsync('queue', workItem._id)
+          unlock()
           await redisClient.hsetAsync('torrents', hash, JSON.stringify(await functions.scrape(torrent, trackerIgnore)))
+          unlock = await lock('qLock')
           await redisClient.sremAsync('queue', hash)
+          unlock()
+        } else {
+          unlock()
         }
       }
     }
   } catch (err) {
     console.error(err)
-  } finally {
-    if (typeof unlock === 'function') unlock()
   }
 }
 
