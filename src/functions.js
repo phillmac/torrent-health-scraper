@@ -31,6 +31,7 @@ module.exports = function (redisClient, lock, debugVerbose = false) {
       try {
         const dht = new DHT()
         const peers = []
+        dht.on('error', err => reject(err))
         dht.on('peer', function (peer, _ih, _from) {
           const peerhash = crypto.createHash('md5').update(peer.host + peer.port).digest('hex')
           if (!(peers.includes(peerhash))) {
