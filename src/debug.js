@@ -46,13 +46,12 @@ const functions = (require('./functions.js')(redisClient, lock, true))
 async function debugScrape (hash) {
   let unlock
   try {
-    const rawTorrents = await redisClient.hgetallAsync('torrents')
-    const torrentHashes = Object.keys(rawTorrents)
+    const torrentHashes = await redisClient.hkeysAsync('torrents')
 
     if (!(torrentHashes.includes(hash))) {
       console.error(`Hash ${hash} is not valid`)
     } else {
-      const torrent = JSON.parse(rawTorrents[hash])
+      const torrent = JSON.parse(await redisClient.hgetAsync('torrents', hash))
 
       const trackerIgnore = await redisClient.smembersAsync('tracker_ignore')
       console.debug('Waiting for queue lock')
