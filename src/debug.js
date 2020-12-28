@@ -108,7 +108,7 @@ if (process.env.TORRENT_HASH !== '' && process.env.TORRENT_HASH !== undefined) {
 } else if (args['--torrent-hashes-stdin']) {
   (async () => {
     const fs = require('fs')
-    const hashesRaw = fs.readFileSync(0, 'utf-8')
+    const hashesRaw = fs.readFileSync(0, 'utf-8').trim()
     const hashes = hashesRaw.split(' ')
     for (const h of hashes) {
       console.info(`Debugging hash ${h} [${hashes.indexOf(h)}/${hashes.length}]`)
