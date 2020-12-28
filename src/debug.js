@@ -9,6 +9,7 @@ class Cli {
       `
 Debug v${version}
 Usage:
+    debug.js [options]
     debug.js --torrent-hash=TORRENT_HASH [options]
     debug.js --torrent-hashes-stdin [options]
     debug.js -h | --help | --version
