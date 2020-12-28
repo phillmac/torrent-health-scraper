@@ -56,8 +56,7 @@ async function debugScrape (hash) {
       unlock = await lock('qLock')
       console.debug('Fetching queue contents')
       const queued = await redisClient.smembersAsync('queue')
-      console.debug({queued})
-      if (hash in queued) {
+      if (queued.includes(hash)) {
         console.error(`Hash ${hash} is already queued`)
         unlock()
       } else {
