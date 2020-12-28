@@ -81,7 +81,7 @@ async function debugScrape (hash) {
           trackers
         })
         if (isStale) {
-          await redisClient.saddAsync('queue', torrent._id)
+          await redisClient.saddAsync('queue', hash)
           unlock()
           await redisClient.hsetAsync('torrents', hash, JSON.stringify(await functions.scrape(torrent, trackerIgnore)))
           unlock = await lock('qLock')
