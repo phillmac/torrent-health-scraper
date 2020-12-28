@@ -57,9 +57,9 @@ async function debugScrape (hash) {
       console.debug('Fetching queue contents')
       const queued = await redisClient.smembersAsync('queue')
       if (hash in queued) {
-          console.error(`Hash ${hash} is already queued`)
-          unlock()
-        } else {
+        console.error(`Hash ${hash} is already queued`)
+        unlock()
+      } else {
         const torrent = JSON.parse(await redisClient.hgetAsync('torrents', hash))
         const isStale = functions.isStale(torrent, trackerIgnore)
         const isStaleDHT = functions.isStaleDHT(torrent)
