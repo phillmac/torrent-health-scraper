@@ -133,6 +133,7 @@ module.exports = function (redisClient, lock, debugVerbose = false) {
     if (torrent.dhtData.scraped_date + maxAge < Math.floor(new Date() / 1000)) {
       return true
     }
+    return false
   }
 
   return { scrape, scrapeDHT, scrapeTrackers, isStale, isStaleTracker, isStaleDHT }
