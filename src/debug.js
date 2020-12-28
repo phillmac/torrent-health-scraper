@@ -65,20 +65,20 @@ async function debugScrape (hash) {
         const isStale = functions.isStale(torrent, trackerIgnore)
         const isStaleDHT = functions.isStaleDHT(torrent)
         const dhtScraped = torrent?.dhtData?.scraped_date
-        const trackers = torrent.trackers.map(tracker => {
-          return {
-            tracker,
-            stale: functions.isStaleTracker(torrent, tracker, trackerIgnore),
-            lastScraped: torrent?.trackerData && tracker in torrent.trackerData ? torrent.trackerData[tracker].scraped_date : 'never',
-            isBlacklisted: trackerIgnore.includes(tracker)
-          }
-        })
+        // const trackers = torrent.trackers.map(tracker => {
+        //   return {
+        //     tracker,
+        //     stale: functions.isStaleTracker(torrent, tracker, trackerIgnore),
+        //     lastScraped: torrent?.trackerData && tracker in torrent.trackerData ? torrent.trackerData[tracker].scraped_date : 'never',
+        //     isBlacklisted: trackerIgnore.includes(tracker)
+        //   }
+        // })
         console.info({
           hash,
           isStale,
           isStaleDHT,
-          dhtScraped,
-          trackers
+          dhtScraped //,
+          // trackers
         })
         if (isStale) {
           await redisClient.saddAsync('queue', hash)
