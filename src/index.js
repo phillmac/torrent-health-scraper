@@ -22,9 +22,9 @@ async function run () {
         await redisClient.saddAsync('queue', workItem._id)
         unlock()
         await redisClient.hsetAsync('torrents', workItem._id, JSON.stringify(await functions.scrape(workItem, trackerIgnore)))
-        unlock = await lock('qLock')
+        //unlock = await lock('qLock')
         await redisClient.sremAsync('queue', workItem._id)
-        unlock()
+        //unlock()
       } else {
         unlock()
         console.info('No stale torrents')
