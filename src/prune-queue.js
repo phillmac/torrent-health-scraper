@@ -41,10 +41,10 @@ setInterval(async () => {
   const queued = new Set(await redisClient.smembersAsync('queue'))
   setTimeout(async () => {
     const unlock = await lock('qLock')
-    for (const q of await redisClient.smembersAsync('queue')) {
-      queued.delete(q)
-    }
-    const remove = [...queued]
+    const remove =
+    (await redisClient.smembersAsync('queue'))
+      .filter(q => queued.includes(q))
+
     if (remove.length > 0) {
       await redisClient.sremAsync('queue', ...remove)
       console.info(`Removed ${remove}`)
