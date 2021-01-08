@@ -43,7 +43,7 @@ setInterval(async () => {
     const unlock = await lock('qLock')
     const remove =
     (await redisClient.smembersAsync('queue'))
-      .filter(q => queued.includes(q))
+      .filter(q => queued.contains(q))
 
     if (remove.length > 0) {
       await redisClient.sremAsync('queue', ...remove)
