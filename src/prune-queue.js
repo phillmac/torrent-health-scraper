@@ -38,12 +38,12 @@ if (args['--redis-port']) {
 const { redisClient, lock } = require('./redis.js')
 
 setInterval(async () => {
-  const queued = new Set(await redisClient.smembersAsync('queue'))
+  const queued = await redisClient.smembersAsync('queue')
   setTimeout(async () => {
     const unlock = await lock('qLock')
     const remove =
     (await redisClient.smembersAsync('queue'))
-      .filter(q => queued.contains(q))
+      .filter(q => queued.includes(q))
 
     if (remove.length > 0) {
       await redisClient.sremAsync('queue', ...remove)
