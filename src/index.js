@@ -5,28 +5,41 @@ const functions = (require('./functions.js')(redisClient, lock))
 
 let lockout = false
 
+async function getWorkItems () {
+  const torrentKeys = await redisClient.hkeysAysnc('torrents')
+  const trackerIgnore = await redisClient.smembersAsync('tracker_ignore')
+  const candidates = torrents
+    .filter(t => functions.isStale(t, trackerIgnore))
+  const unlock = await lock('qLock')
+  const queued = await redisClient.smembersAsync('queue')
+  const staleTorrents = candidates
+    .filter(t => !(queued.includes(t._id)))
+  if (staleTorrents.length > 0) {
+    await redisClient.saddAsync('queue', staleTorrents.map(t => t._id))
+  }
+  unlock()
+  return staleTorrents
+}
+
+async function process (workItems) {
+  for (const wItem of workItems) {
+    try {
+      await redisClient.hsetAsync('torrents', wItem._id, JSON.stringify(await functions.scrape(wItem, trackerIgnore)))
+      await redisClient.sremAsync('queue', wItem._id)
+    } catch (err) {
+      console.error(err)
+    }
+  }
+}
+
 async function run () {
   if (!lockout) {
     try {
-      let unlock
       lockout = true
-      const torrents = Object.values(await redisClient.hgetallAsync('torrents'))
-        .map(t => JSON.parse(t))
-      const trackerIgnore = await redisClient.smembersAsync('tracker_ignore')
-      unlock = await lock('qLock')
-      const queued = await redisClient.smembersAsync('queue')
-      const workItem = torrents
-        .filter(t => !(queued.includes(t._id)))
-        .find(t => functions.isStale(t, trackerIgnore))
-      if (workItem) {
-        await redisClient.saddAsync('queue', workItem._id)
-        unlock()
-        await redisClient.hsetAsync('torrents', workItem._id, JSON.stringify(await functions.scrape(workItem, trackerIgnore)))
-        //unlock = await lock('qLock')
-        await redisClient.sremAsync('queue', workItem._id)
-        //unlock()
+      const workItems = getWorkItems()
+      if (workItems.length > 0) {
+        await process(workItems)
       } else {
-        unlock()
         console.info('No stale torrents')
       }
     } catch (err) {
@@ -35,8 +48,6 @@ async function run () {
     }
     console.debug(new Date())
     lockout = false
-  } else {
-    //console.debug('Already running')
   }
 
   if (doRecycle) {
