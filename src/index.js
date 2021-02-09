@@ -13,7 +13,7 @@ async function run () {
 
       async function getWorkItems () {
         const torrents = Object.values(await redisClient.hgetallAsync('torrents'))
-        .map(t => JSON.parse(t))
+          .map(t => JSON.parse(t))
         const trackerIgnore = await redisClient.smembersAsync('tracker_ignore')
         const candidates = torrents
           .filter(t => functions.isStale(t, trackerIgnore))
