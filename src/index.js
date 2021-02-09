@@ -17,6 +17,7 @@ async function run () {
         const trackerIgnore = await redisClient.smembersAsync('tracker_ignore')
         const candidates = torrents
           .filter(t => functions.isStale(t, trackerIgnore))
+        console.debug({ candidates: candidates.length })
         const unlock = await lock('qLock')
         const queued = await redisClient.smembersAsync('queue')
         const staleTorrents = candidates
@@ -25,6 +26,7 @@ async function run () {
           await redisClient.saddAsync('queue', staleTorrents.map(t => t._id))
         }
         unlock()
+        console.debug({ staleTorrents: staleTorrents.length })
         return staleTorrents
       }
 
