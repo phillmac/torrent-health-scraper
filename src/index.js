@@ -12,7 +12,7 @@ async function run () {
       const trackerIgnore = await redisClient.smembersAsync('tracker_ignore')
 
       async function getWorkItems () {
-        const torrents = await redisClient.hgetallAysnc('torrents')
+        const torrents = await redisClient.hgetallAsync('torrents')
         const trackerIgnore = await redisClient.smembersAsync('tracker_ignore')
         const candidates = torrents
           .filter(t => functions.isStale(t, trackerIgnore))
