@@ -41,7 +41,7 @@ async function run () {
         }
       }
 
-      const workItems = getWorkItems()
+      const workItems = await getWorkItems()
       if (workItems.length > 0) {
         await process(workItems)
       } else {
