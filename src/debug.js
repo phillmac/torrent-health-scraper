@@ -122,9 +122,8 @@ if (process.env.TORRENT_HASH !== '' && process.env.TORRENT_HASH !== undefined) {
   })()
 } else if (args['--torrent-hashes-stdin-ln']) {
   (async () => {
-    const fileStream = fs.createReadStream(0, 'utf-8')
     const rl = readline.createInterface({
-      input: fileStream
+      input: process.stdin
     })
 
     for await (const line of rl) {
