@@ -2,6 +2,8 @@
 
 const { docopt } = require('docopt')
 const { version } = require('../package.json')
+const readline = require('readline')
+const fs = require('fs')
 
 class Cli {
   constructor () {
@@ -12,6 +14,7 @@ Usage:
     debug.js [options]
     debug.js --torrent-hash=TORRENT_HASH [options]
     debug.js --torrent-hashes-stdin [options]
+    debug.js --torrent-hashes-stdin-lines [options]
     debug.js -h | --help | --version
 Options:
     --redis-host=REDIS_HOST             Connect to redis on REDIS_HOST
@@ -107,10 +110,25 @@ if (process.env.TORRENT_HASH !== '' && process.env.TORRENT_HASH !== undefined) {
   })()
 } else if (args['--torrent-hashes-stdin']) {
   (async () => {
-    const fs = require('fs')
     const hashesRaw = fs.readFileSync(0, 'utf-8').trim()
     const hashes = hashesRaw.split(' ')
     for (const h of hashes) {
+      console.info(`Debugging hash ${h} [${hashes.indexOf(h)}/${hashes.length + 1}]`)
+      await debugScrape(h)
+      console.info('Finished')
+    }
+    await redisClient.quitAsync()
+    process.exit()
+  })()
+} else if (args['--torrent-hashes-stdin-ln']) {
+  (async () => {
+    const fileStream = fs.createReadStream(0, 'utf-8')
+    const rl = readline.createInterface({
+      input: fileStream
+    })
+
+    for await (const line of rl) {
+      console.log(line)
       console.info(`Debugging hash ${h} [${hashes.indexOf(h)}/${hashes.length + 1}]`)
       await debugScrape(h)
       console.info('Finished')
