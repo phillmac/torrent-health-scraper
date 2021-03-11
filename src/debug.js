@@ -19,6 +19,7 @@ Usage:
 Options:
     --redis-host=REDIS_HOST             Connect to redis on REDIS_HOST
     --redis-port=REDIS_PORT             Connect to redis on REDIS_PORT
+    --ignore-queue-lock
 `
     const _args = docopt(doc, {
       version: version
@@ -47,7 +48,7 @@ if (args['--torrent-hash']) {
 const { redisClient, lock } = require('./redis.js')
 const functions = (require('./functions.js')(redisClient, lock, true))
 
-async function debugScrape (hash) {
+async function debugScrape (hash, ignoreQueueLock = false) {
   let unlock
   try {
     const torrentHashes = await redisClient.hkeysAsync('torrents')
@@ -57,42 +58,48 @@ async function debugScrape (hash) {
     } else {
       const trackerIgnore = await redisClient.smembersAsync('tracker_ignore')
       console.debug('Waiting for queue lock')
-      unlock = await lock('qLock')
-      console.debug('Fetching queue contents')
-      const queued = await redisClient.smembersAsync('queue')
-      if (queued.includes(hash)) {
-        console.error(`Hash ${hash} is already queued`)
+      if (ignoreQueueLock) {
+        console.info('Ignoring queue lock')
+      } else {
+        unlock = await lock('qLock')
+        console.debug('Fetching queue contents')
+        const queued = await redisClient.smembersAsync('queue')
+        if (queued.includes(hash)) {
+          console.error(`Hash ${hash} is already queued`)
+          unlock()
+          return
+        }
+      }
+
+      const torrent = JSON.parse(await redisClient.hgetAsync('torrents', hash))
+      const isStale = functions.isStale(torrent, trackerIgnore)
+      const isStaleDHT = functions.isStaleDHT(torrent)
+      const dhtScraped = torrent?.dhtData?.scraped_date
+      // const trackers = torrent.trackers.map(tracker => {
+      //   return {
+      //     tracker,
+      //     stale: functions.isStaleTracker(torrent, tracker, trackerIgnore),
+      //     lastScraped: torrent?.trackerData && tracker in torrent.trackerData ? torrent.trackerData[tracker].scraped_date : 'never',
+      //     isBlacklisted: trackerIgnore.includes(tracker)
+      //   }
+      // })
+      console.info({
+        hash,
+        isStale,
+        isStaleDHT,
+        dhtScraped //,
+        // trackers
+      })
+      if (isStale) {
+        if (!unlock) unlock = await lock('qLock')
+        await redisClient.saddAsync('queue', hash)
+        unlock()
+        await redisClient.hsetAsync('torrents', hash, JSON.stringify(await functions.scrape(torrent, trackerIgnore)))
+        unlock = await lock('qLock')
+        await redisClient.sremAsync('queue', hash)
         unlock()
       } else {
-        const torrent = JSON.parse(await redisClient.hgetAsync('torrents', hash))
-        const isStale = functions.isStale(torrent, trackerIgnore)
-        const isStaleDHT = functions.isStaleDHT(torrent)
-        const dhtScraped = torrent?.dhtData?.scraped_date
-        // const trackers = torrent.trackers.map(tracker => {
-        //   return {
-        //     tracker,
-        //     stale: functions.isStaleTracker(torrent, tracker, trackerIgnore),
-        //     lastScraped: torrent?.trackerData && tracker in torrent.trackerData ? torrent.trackerData[tracker].scraped_date : 'never',
-        //     isBlacklisted: trackerIgnore.includes(tracker)
-        //   }
-        // })
-        console.info({
-          hash,
-          isStale,
-          isStaleDHT,
-          dhtScraped //,
-          // trackers
-        })
-        if (isStale) {
-          await redisClient.saddAsync('queue', hash)
-          unlock()
-          await redisClient.hsetAsync('torrents', hash, JSON.stringify(await functions.scrape(torrent, trackerIgnore)))
-          unlock = await lock('qLock')
-          await redisClient.sremAsync('queue', hash)
-          unlock()
-        } else {
-          unlock()
-        }
+        if (unlock) unlock()
       }
     }
   } catch (err) {
@@ -114,7 +121,7 @@ if (process.env.TORRENT_HASH !== '' && process.env.TORRENT_HASH !== undefined) {
     const hashes = hashesRaw.split(' ')
     for (const h of hashes) {
       console.info(`Debugging hash ${h} [${hashes.indexOf(h)}/${hashes.length + 1}]`)
-      await debugScrape(h)
+      await debugScrape(h, Boolean(args['--ignore-queue-lock']))
       console.info('Finished')
     }
     await redisClient.quitAsync()
@@ -129,7 +136,7 @@ if (process.env.TORRENT_HASH !== '' && process.env.TORRENT_HASH !== undefined) {
     for await (const line of rl) {
       const h = line.trim()
       console.info(`Debugging hash ${h}`)
-      await debugScrape(h)
+      await debugScrape(h, Boolean(args['--ignore-queue-lock']))
       console.info('Finished')
     }
     await redisClient.quitAsync()
