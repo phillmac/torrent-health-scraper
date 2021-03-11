@@ -127,8 +127,8 @@ if (process.env.TORRENT_HASH !== '' && process.env.TORRENT_HASH !== undefined) {
     })
 
     for await (const line of rl) {
-      console.log(line)
-      console.info(`Debugging hash ${h} [${hashes.indexOf(h)}/${hashes.length + 1}]`)
+      const h = line.trim()
+      console.info(`Debugging hash ${h}`)
       await debugScrape(h)
       console.info('Finished')
     }
