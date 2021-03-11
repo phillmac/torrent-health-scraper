@@ -14,7 +14,7 @@ Usage:
     debug.js [options]
     debug.js --torrent-hash=TORRENT_HASH [options]
     debug.js --torrent-hashes-stdin [options]
-    debug.js --torrent-hashes-stdin-lines [options]
+    debug.js --torrent-hashes-stdin-ln [options]
     debug.js -h | --help | --version
 Options:
     --redis-host=REDIS_HOST             Connect to redis on REDIS_HOST
