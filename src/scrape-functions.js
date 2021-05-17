@@ -27,7 +27,7 @@ module.exports = function (redisClient, lock, debugVerbose = false) {
       Object.assign(torrent.trackerData, trackerResults)
 
       const sucessfullTrackers = Object.keys(trackerResults)
-      const missingTrackers = staleTrackers.map(t => !sucessfullTrackers.includes(t))
+      const missingTrackers = staleTrackers.filter(t => !sucessfullTrackers.includes(t))
       console.info({ missingTrackers })
       if (missingTrackers.length > 0) await appendTrackerErrors()
     }
