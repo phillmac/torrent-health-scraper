@@ -101,6 +101,8 @@ module.exports = function (redisClient, lock, debugVerbose = false) {
         results[data.announce] = data
         resultsComplete()
       })
+
+      trackerClient.scrape()
     })
   }
 
