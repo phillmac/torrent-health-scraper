@@ -20,7 +20,7 @@ module.exports = function (redisClient, lock, debugVerbose = false) {
     const staleTrackers = torrent.trackers
       .filter((tracker) => isStaleTracker(torrent, tracker, trackerIgnore))
 
-    if (staleTrackers.length) {
+    if (staleTrackers.length > 0) {
       wasStale = true
 
       const trackerResults = await scrapeTrackers(torrent._id, staleTrackers)
