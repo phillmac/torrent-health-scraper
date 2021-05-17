@@ -28,6 +28,7 @@ module.exports = function (redisClient, lock, debugVerbose = false) {
 
       const sucessfullTrackers = Object.keys(trackerResults)
       const missingTrackers = staleTrackers.map(t => !sucessfullTrackers.includes(t))
+      console.info({ missingTrackers })
       if (missingTrackers.length > 0) await appendTrackerErrors()
     }
 
@@ -114,7 +115,7 @@ module.exports = function (redisClient, lock, debugVerbose = false) {
       await redisClient.hsetAsync('tracker_errors', t, JSON.stringify(trackerErrors))
     }
     unlock()
-    console.info('Added errors for trackers:', trackers )
+    console.info('Added errors for trackers:', trackers)
   }
 
   async function updateStats (hash, ignoreQueueLock = false) {
