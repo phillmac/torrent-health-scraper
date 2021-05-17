@@ -70,7 +70,7 @@ module.exports = function (redisClient, lock, debugVerbose = false) {
       const results = {}
       let trackersPending = announce.length
 
-      const trackerClient = Client({
+      const trackerClient = new Client({
         infoHash,
         announce,
         peerId: new Buffer.from('01234567890123456789'),
