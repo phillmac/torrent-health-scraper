@@ -114,6 +114,7 @@ module.exports = function (redisClient, lock, debugVerbose = false) {
       await redisClient.hsetAsync('tracker_errors', t, JSON.stringify(trackerErrors))
     }
     unlock()
+    console.info('Added errors for trackers:', trackers )
   }
 
   async function updateStats (hash, ignoreQueueLock = false) {
