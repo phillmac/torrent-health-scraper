@@ -29,7 +29,7 @@ module.exports = function (redisClient, lock, debugVerbose = false) {
       const sucessfullTrackers = Object.keys(trackerResults)
       const missingTrackers = staleTrackers.filter(t => !sucessfullTrackers.includes(t))
       console.info({ missingTrackers })
-      if (missingTrackers.length > 0) await appendTrackerErrors()
+      if (missingTrackers.length > 0) await appendTrackerErrors(missingTrackers)
     }
 
     console.info(`Finished scraping ${torrent._id}`)
