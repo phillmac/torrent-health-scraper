@@ -80,7 +80,7 @@ module.exports = function (redisClient, lock, debugVerbose = false) {
       const resultsComplete = () => {
         trackersPending -= 1
         if (trackersPending <= 0) {
-          trackerClient.stop()
+          trackerClient.destroy()
           resolve(results)
         }
       }
