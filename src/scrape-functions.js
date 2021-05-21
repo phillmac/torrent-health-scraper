@@ -24,7 +24,11 @@ module.exports = function (redisClient, lock, debugVerbose = false) {
       wasStale = true
 
       const trackerResults = await scrapeTrackers(torrent._id, staleTrackers)
-      torrent.trackerData = Object.assign({}, torrent.trackerData, trackerResults)
+      if (!trackerData) {
+        torrent.trackerData = trackerResults
+      } else {
+        torrent.trackerData = Object.assign(torrent.trackerData, trackerResults)
+      }
 
       const sucessfullTrackers = Object.keys(trackerResults)
       const missingTrackers = staleTrackers.filter(t => !sucessfullTrackers.includes(t))
