@@ -45,8 +45,9 @@ async function * getTorrents () {
 }
 
 async function getStale () {
+  const trackerIgnore = await redisClient.smembersAsync('tracker_ignore')
   for await (const t of getTorrents()) {
-    if (isStale(t)) {
+    if (isStale(t, trackerIgnore)) {
       process.stdout.write(`${t._id}\n`)
     }
   }
