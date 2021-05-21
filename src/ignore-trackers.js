@@ -35,7 +35,7 @@ async function run () {
       lockout = true
       const fails = {}
       const unlock = await lock('eLock')
-      const trackerErrors = await redisClient.hgetallAsync('tracker_errors')
+      const trackerErrors = (await redisClient.hgetallAsync('tracker_errors') ?? {})
       const trackerEventsRaw = (await redisClient.hgetallAsync('tracker_events') ?? {})
       const trackerEvents = Object.fromEntries(Object.keys(trackerEventsRaw).map(k => [k, JSON.parse(trackerEventsRaw[k]) ?? []]))
       const events = Object.fromEntries(Object.keys(trackerEvents).map(k => [k, Array.from(trackerEvents[k])]))
