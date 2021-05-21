@@ -49,7 +49,7 @@ const { redisClient, torrentsFromPreload } = require('./utils.js')
 async function preload () {
   const torrents = await torrentsFromPreload(process.env.PRELOAD_URL)
   const existing = await redisClient.hkeys('torrents')
-  const missing = torrents.filter(t => !(existing.includes(t._id)))
+  const missing = torrents.filter(t => !(existing && existing.includes(t._id)))
   console.info(`${missing.length} torrents to add`)
 
   for (const t of missing) {

@@ -26,7 +26,7 @@ redisClient.on('error', function (err) {
 
 async function populate () {
   const existing = await redisClient.hkeys('torrents')
-  const missing = torrents.filter(t => !(existing.includes(t._id)))
+  const missing = torrents.filter(t => !(existing && existing.includes(t._id)))
   console.info(`${missing.length} torrents to add`)
 
   for (const t of missing) {
