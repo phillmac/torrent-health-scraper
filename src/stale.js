@@ -38,9 +38,8 @@ if (args['--redis-port']) {
 const { redisClient, lock } = require('./redis.js')
 const { isStale } = require('./scrape-functions.js')(redisClient, lock)
 
-
-async function* getTorrents() {
-  for(const h of (await redisClient.hkeysAsync('torrents'))) {
+async function * getTorrents () {
+  for (const h of (await redisClient.hkeysAsync('torrents'))) {
     yield JSON.parse(await redisClient.hgetAsync('torrents', h))
   }
 }
