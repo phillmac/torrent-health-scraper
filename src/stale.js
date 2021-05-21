@@ -12,6 +12,7 @@ Usage:
     stale.js [options]
     stale.js -h | --help | --version
 Options:
+    --max_age=MAX_AGE                   Set max age for scrape results
     --redis-host=REDIS_HOST             Connect to redis on REDIS_HOST
     --redis-port=REDIS_PORT             Connect to redis on REDIS_PORT
 `
@@ -33,6 +34,10 @@ if (args['--redis-host']) {
 
 if (args['--redis-port']) {
   process.env.REDIS_PORT = args['--redis-port']
+}
+
+if (args['--max-age']) {
+  process.env.MAX_AGE = args['--max-age']
 }
 
 const { redisClient, lock } = require('./redis.js')
