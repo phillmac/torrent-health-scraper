@@ -90,7 +90,7 @@ async function run () {
 
       const blRemove = blContents
         .filter((tRem) =>
-          (!(trackerIgnore.includes(tRem)) && (fails[tRem]?.length < minErrors)))
+          (!(trackerIgnore.includes(tRem)) && ((fails[tRem]?.length ?? 0) < minErrors)))
         .filter((tRem) => expBackoffFilter(tRem))
       if (blRemove.length > 0) {
         await redisClient.sremAsync('tracker_ignore', ...blRemove)
