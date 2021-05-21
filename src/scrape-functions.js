@@ -24,7 +24,7 @@ module.exports = function (redisClient, lock, debugVerbose = false) {
       wasStale = true
 
       const trackerResults = await scrapeTrackers(torrent._id, staleTrackers)
-      if (!trackerData) {
+      if (!torrent.trackerData) {
         torrent.trackerData = trackerResults
       } else {
         torrent.trackerData = Object.assign(torrent.trackerData, trackerResults)
@@ -139,7 +139,7 @@ module.exports = function (redisClient, lock, debugVerbose = false) {
 
       const torrent = JSON.parse(await redisClient.hgetAsync('torrents', hash))
 
-      if (!torrent._id) {
+      if (!torrent?._id) {
         throw new Error(`Unable to find info for torrent with id ${hash}`)
       }
 
