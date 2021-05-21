@@ -51,6 +51,7 @@ async function getStale () {
       process.stdout.write(`${t._id}\n`)
     }
   }
+  await redisClient.quitAsync()
 }
 
 getStale()
