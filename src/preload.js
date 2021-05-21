@@ -7,13 +7,13 @@ class Cli {
     constructor () {
         const doc =
         `
-        Preload v${version}
-        Usage:
-        preload.js [--preload-url=PRELOAD_URL] [options]
-        preload.js -h | --help | --version
-        Options:
-        --redis-host=REDIS_HOST             Connect to redis on REDIS_HOST
-        --redis-port=REDIS_PORT             Connect to redis on REDIS_PORT
+Preload v${version}
+Usage:
+    preload.js [--preload-url=PRELOAD_URL] [options]
+    preload.js -h | --help | --version
+Options:
+    --redis-host=REDIS_HOST             Connect to redis on REDIS_HOST
+    --redis-port=REDIS_PORT             Connect to redis on REDIS_PORT
         `
         const _args = docopt(doc, {
             version: version
