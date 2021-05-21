@@ -82,4 +82,4 @@ async function update (link, torrent) {
     await add(link, torrent)
   }
 }
-module.exports = { torrentFromUrl, torrentsFromPreload, healthFromUrl, sleep, add, update }
+module.exports = { redisClient, torrentFromUrl, torrentsFromPreload, healthFromUrl, sleep, add, update }
