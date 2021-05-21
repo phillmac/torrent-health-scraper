@@ -16,7 +16,7 @@ const redisClient = redis.createClient({ host: process.env.REDIS_HOST, port: par
 const lock = promisify(require('redis-lock')(redisClient))
 
 redisClient.on('connect', function () {
-  console.info('Redis client connected')
+  process.stderr.write('Redis client connected\n')
 })
 
 redisClient.on('error', function (err) {
