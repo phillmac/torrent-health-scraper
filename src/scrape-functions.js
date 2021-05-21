@@ -123,10 +123,10 @@ module.exports = function (redisClient, lock, debugVerbose = false) {
     let unlock
     try {
       const trackerIgnore = await redisClient.smembersAsync('tracker_ignore')
-      console.debug('Waiting for queue lock')
       if (ignoreQueueLock) {
         console.info('Ignoring queue lock')
       } else {
+        console.debug('Waiting for queue lock')
         unlock = await lock('qLock')
         console.debug('Fetching queue contents')
         const queued = await redisClient.smembersAsync('queue')
