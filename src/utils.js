@@ -9,6 +9,11 @@ async function torrentFromUrl (url) {
   return parseTorrent(buffer)
 }
 
+async function torrentsFromPreload (url) {
+  const resp = await fetch(url)
+  return await resp.json()
+}
+
 async function healthFromUrl (url, hash) {
   const resp = await fetch(url,
     {
@@ -77,4 +82,4 @@ async function update (link, torrent) {
     await add(link, torrent)
   }
 }
-module.exports = { torrentFromUrl, healthFromUrl, sleep, add, update }
+module.exports = { torrentFromUrl, torrentsFromPreload, healthFromUrl, sleep, add, update }
