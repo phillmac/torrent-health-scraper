@@ -28,7 +28,7 @@ function runWorker () {
         return 252
     fi
 
-    node src/scrape-cli.js --hashes-stdin-ln < <(
+    node src/scrape-cli.js --torrent-hashes-stdin-ln < <(
         while read -r fetched_item
         do
             if [[ -n "${fetched_item}" ]]
