@@ -9,6 +9,7 @@ function serveQueue() {
     done <  <( 
         while :
         do
+            echo "Fetching stale list" >&2
             node src/stale.js
             sleep 1
         done
@@ -30,7 +31,11 @@ function runWorker () {
     node src/scrape-cli.js --hashes-stdin-ln < <(
         while read -r fetched_item
         do
-            [[ -n "${fetched_item}" ]] && echo "${fetched_item}"
+            if [[ -n "${fetched_item}" ]]
+            then
+                echo "Got item ${fetched_item}" >&2
+                echo "${fetched_item}"
+            fi
         done < <( 
             while :
             do
