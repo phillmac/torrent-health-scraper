@@ -72,6 +72,7 @@ module.exports = function (redisClient, lock, debugVerbose = false) {
     return new Promise((resolve, reject) => {
       console.info(`Scraping trackers for ${infoHash}`)
       const results = {}
+      const errors = []
       let trackersPending = announce.length
 
       const trackerClient = new Client({
@@ -84,11 +85,13 @@ module.exports = function (redisClient, lock, debugVerbose = false) {
       const resultsComplete = () => {
         trackersPending -= 1
         if (trackersPending <= 0) {
+          logErrors(infoHash, errors)
           resolve(results)
         }
       }
 
       trackerClient.on('warning', (err) => {
+        errors.push(err)
         console.warn(err)
         resultsComplete()
       })
@@ -107,7 +110,9 @@ module.exports = function (redisClient, lock, debugVerbose = false) {
       trackerClient.scrape()
     })
   }
-
+  function logErrors (infoHash, errors) {
+    return redisClient.hsetAsync('torrent_errors', infoHash, JSON.stringify(errors))
+  }
   async function appendTrackerErrors (trackers) {
     const unlock = await lock('eLock')
     for (const t of trackers) {
