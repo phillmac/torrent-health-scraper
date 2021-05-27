@@ -78,7 +78,7 @@ module.exports = function (redisClient, lock, debugVerbose = false) {
       const trackerClient = new Client({
         infoHash,
         announce,
-        peerId: new Buffer.from('01234567890123456789'),
+        peerId: Buffer.from('01234567890123456789'),
         port: 6881
       })
 
