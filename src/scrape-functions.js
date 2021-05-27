@@ -111,7 +111,9 @@ module.exports = function (redisClient, lock, debugVerbose = false) {
     })
   }
   function logErrors (infoHash, errors) {
-    return redisClient.hsetAsync('torrent_errors', infoHash, JSON.stringify(errors))
+    if (errors.length > 0) {
+      return redisClient.hsetAsync('torrent_errors', infoHash, JSON.stringify(errors))
+    }
   }
   async function appendTrackerErrors (trackers) {
     const unlock = await lock('eLock')
