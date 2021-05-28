@@ -91,7 +91,7 @@ module.exports = function (redisClient, lock, debugVerbose = false) {
       }
 
       trackerClient.on('warning', (err) => {
-        errors.push(err.messa)
+        errors.push(err.message)
         console.warn(err)
         resultsComplete()
       })
@@ -112,7 +112,7 @@ module.exports = function (redisClient, lock, debugVerbose = false) {
   }
   function logErrors (infoHash, errors) {
     if (errors.length > 0) {
-      return redisClient.hsetAsync('torrent_errors', infoHash, JSON.stringify(errors.map(e => e.message)))
+      return redisClient.hsetAsync('torrent_errors', infoHash, JSON.stringify(errors))
     }
   }
   async function appendTrackerErrors (trackers) {
