@@ -20,29 +20,39 @@ function serveQueue() {
 function runWorker () {
     local fetched_item
     local fetch_url
+    local recycle_count
+    local count
 
     fetch_url="${1:-FETCH_URL}"
+    recycle_count="${2:-${RECYCLE_COUNT:-10000}}"
 
     if [[ -z "${fetch_url}" ]]; then
         echo "FETCH_URL cannot be empty" >&2
         return 252
     fi
 
-    node src/scrape-cli.js --torrent-hashes-stdin-ln < <(
-        while read -r fetched_item
-        do
-            if [[ -n "${fetched_item}" ]]
-            then
-                echo "Got item ${fetched_item}" >&2
-                echo "${fetched_item}"
-            fi
-        done < <( 
-            while :
+    while :
+    do
+        ((count=0))
+        node src/scrape-cli.js --torrent-hashes-stdin-ln < <(
+            while read -r fetched_item
             do
-                curl --silent "${fetch_url}"
-                sleep 1
-            done
+                if [[ -n "${fetched_item}" ]]
+                then
+                    echo "Got item ${fetched_item}" >&2
+                    echo "${fetched_item}"
+                    ((count++))
+                fi
+            done < <( 
+                while ((count <= recycle_count))
+                do
+                    curl --silent "${fetch_url}"
+                    sleep 1
+                done
+            )
         )
-    )
+
+    done
+
 
 }
