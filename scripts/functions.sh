@@ -6,7 +6,7 @@ function serveQueue() {
     while read -r queue_item
     do
       echo -e "HTTP/1.1 200 OK\n\n ${queue_item}" | ncat -l -p "${LISTEN_PORT:-1500}" >/dev/null
-    done <  <(
+    done < <(
         while :
         do
             echo "Fetching stale list" >&2
