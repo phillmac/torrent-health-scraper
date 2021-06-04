@@ -33,8 +33,8 @@ function runWorker () {
 
     while :
     do
-        ((count=0))
         node src/scrape-cli.js --torrent-hashes-stdin-ln < <(
+            ((count=0))
             while read -r fetched_item
             do
                 if [[ -n "${fetched_item}" ]]
@@ -42,11 +42,13 @@ function runWorker () {
                     echo "Got item ${fetched_item} [${count}/${recycle_count}]" >&2
                     echo "${fetched_item}"
                     ((count++))
+                    echo "${count}" > /dev/shm/itemscount
                 fi
             done < <( 
-                while ((count <= recycle_count))
+                while itemscount=$(</dev/shm/itemscount) && ((itemscount <= recycle_count))
                 do
                     curl --silent "${fetch_url}"
+                    ((count++))
                     sleep 1
                 done
             )
