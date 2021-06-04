@@ -30,11 +30,10 @@ function runWorker () {
         echo "FETCH_URL cannot be empty" >&2
         return 252
     fi
-
-    echo 0 > /dev/shm/itemscount
     
     while :
     do
+        echo 0 > /dev/shm/itemscount
         node src/scrape-cli.js --torrent-hashes-stdin-ln < <(
             ((count=0))
             while read -r fetched_item
