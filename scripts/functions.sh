@@ -31,6 +31,8 @@ function runWorker () {
         return 252
     fi
 
+    echo 0 > /dev/shm/itemscount
+    
     while :
     do
         node src/scrape-cli.js --torrent-hashes-stdin-ln < <(
