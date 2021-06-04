@@ -39,7 +39,7 @@ function runWorker () {
             do
                 if [[ -n "${fetched_item}" ]]
                 then
-                    echo "Got item ${fetched_item}" >&2
+                    echo "Got item ${fetched_item} [${count}/${recycle_count}]" >&2
                     echo "${fetched_item}"
                     ((count++))
                 fi
