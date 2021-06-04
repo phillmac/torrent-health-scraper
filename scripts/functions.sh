@@ -24,7 +24,7 @@ function runWorker () {
     local count
 
     fetch_url="${1:-FETCH_URL}"
-    recycle_count="${2:-${RECYCLE_COUNT:-10000}}"
+    recycle_count="${2:-${RECYCLE_COUNT:-5000}}"
 
     if [[ -z "${fetch_url}" ]]; then
         echo "FETCH_URL cannot be empty" >&2
