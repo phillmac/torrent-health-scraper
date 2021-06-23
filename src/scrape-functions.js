@@ -88,6 +88,7 @@ module.exports = function (redisClient, lock, debugVerbose = false) {
         trackersPending -= 1
         if (trackersPending <= 0) {
           logErrors(infoHash, errors)
+          trackerClient.destroy()
           resolve(results)
         }
       }
@@ -99,6 +100,7 @@ module.exports = function (redisClient, lock, debugVerbose = false) {
       })
 
       trackerClient.on('error', (err) => {
+        trackerClient.destroy()
         reject(err)
       })
 
