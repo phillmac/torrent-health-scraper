@@ -109,7 +109,11 @@ module.exports = function (redisClient, lock, debugVerbose = false) {
         resultsComplete()
       })
 
-      setTimeout(resultsComplete, scrapeTimeout * 1000)
+      setTimeout( () => {
+        while(trackersPending > 0) {
+          resultsComplete()
+        }
+      }, scrapeTimeout * 1000)
       trackerClient.scrape()
     })
   }
