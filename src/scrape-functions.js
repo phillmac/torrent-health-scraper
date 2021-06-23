@@ -8,6 +8,8 @@ if (!process.env.MAX_AGE) {
 
 const maxAge = parseInt(process.env.MAX_AGE)
 
+const scrapeTimeout = parseInt(process.env.SCRAPE_TIMEOUT ?? 300)
+
 module.exports = function (redisClient, lock, debugVerbose = false) {
   async function scrape (torrent, trackerIgnore) {
     let wasStale = false
@@ -107,6 +109,7 @@ module.exports = function (redisClient, lock, debugVerbose = false) {
         resultsComplete()
       })
 
+      setTimeout(resultsComplete, scrapeTimeout * 1000)
       trackerClient.scrape()
     })
   }
