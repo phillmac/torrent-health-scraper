@@ -8,7 +8,7 @@ if [[ -z "$REDIS_PORT" ]]; then
     export REDIS_PORT=6379
 fi
 
-url=$1
+url=${1%/}
 collection_type=$2
 
 while read -r file_name
