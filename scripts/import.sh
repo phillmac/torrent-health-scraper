@@ -15,4 +15,4 @@ while read -r file_name
 do
     echo "Adding ${file_name}"
     node --unhandled-rejections=strict src/add.js --torrent-url "${url}/${file_name}" --type "${collection_type}"
-done < <(curl --silent -L "${url}" | grep -o "[a-zA-Z0-9./?=_%:-]*\.torrent" | sort -u)
+done < <(curl --silent -L "${url}" | grep -o "[a-zA-Z0-9./?=_%:-]*\.torrent" | sort -ru)
